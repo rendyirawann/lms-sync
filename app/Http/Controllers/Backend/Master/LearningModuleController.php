@@ -1,0 +1,135 @@
+<?php
+
+namespace App\Http\Controllers\Backend\Master;
+
+use App\Http\Controllers\Controller;
+use App\Models\LearningModule;
+use App\Models\TeachingAssignment;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
+class LearningModuleController extends Controller
+{
+    public function index()
+    {
+        $user = auth()->user();
+        $query = LearningModule::with(['teachingAssignment.teacher.user', 'teachingAssignment.subject', 'teachingAssignment.classRoom']);
+
+        if ($user->hasRole('guru')) {
+            // Guru hanya bisa melihat modul yang terikat dengan penugasannya
+            if (!$user->teacher) {
+                return redirect()->route('dashboard')->with('error', 'Profil guru tidak ditemukan.');
+            }
+            
+            $teacherId = $user->teacher->id;
+            $query->whereHas('teachingAssignment', function($q) use ($teacherId) {
+                $q->where('teacher_id', $teacherId);
+            });
+            
+            // Guru hanya bisa memilih dari penugasan miliknya saat tambah modul
+            $assignments = TeachingAssignment::with(['subject', 'classRoom'])
+                ->where('teacher_id', $teacherId)
+                ->get();
+        } else {
+            // Superadmin bisa melihat dan menambah modul untuk siapa saja
+            $assignments = TeachingAssignment::with(['teacher.user', 'subject', 'classRoom'])->get();
+        }
+
+        $modules = $query->latest()->get();
+        
+        return view('backend.master.learning-modules.index', compact('modules', 'assignments'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'teaching_assignment_id' => 'required',
+            'title' => 'required|string|max:255',
+            'file' => 'required|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:20480', // Max 20MB
+        ]);
+
+        try {
+            $file = $request->file('file');
+            $originalName = $file->getClientOriginalName();
+            $extension = $file->getClientOriginalExtension();
+            $size = $file->getSize();
+            
+            // Simpan file ke storage public/modules
+            $path = $file->store('modules', 'public');
+
+            LearningModule::create([
+                'teaching_assignment_id' => $request->teaching_assignment_id,
+                'title' => $request->title,
+                'description' => $request->description,
+                'file_path' => $path,
+                'file_name' => $originalName,
+                'file_type' => $extension,
+                'file_size' => $size,
+                'is_published' => $request->has('is_published') ? true : false,
+            ]);
+
+            return redirect()->back()->with('success', 'Modul berhasil diunggah!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal mengunggah modul: ' . $e->getMessage());
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        $module = LearningModule::findOrFail($id);
+        
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'file' => 'nullable|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:20480',
+        ]);
+
+        try {
+            $data = [
+                'title' => $request->title,
+                'description' => $request->description,
+                'is_published' => $request->has('is_published') ? true : false,
+            ];
+
+            if ($request->hasFile('file')) {
+                // Hapus file lama
+                Storage::disk('public')->delete($module->file_path);
+                
+                // Upload file baru
+                $file = $request->file('file');
+                $data['file_path'] = $file->store('modules', 'public');
+                $data['file_name'] = $file->getClientOriginalName();
+                $data['file_type'] = $file->getClientOriginalExtension();
+                $data['file_size'] = $file->getSize();
+            }
+
+            $module->update($data);
+
+            return redirect()->back()->with('success', 'Modul berhasil diperbarui!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal memperbarui modul: ' . $e->getMessage());
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $module = LearningModule::findOrFail($id);
+            
+            // Hapus file fisik
+            Storage::disk('public')->delete($module->file_path);
+            
+            // Hapus record database
+            $module->delete();
+
+            return redirect()->back()->with('success', 'Modul berhasil dihapus!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal menghapus modul: ' . $e->getMessage());
+        }
+    }
+
+    public function download($id)
+    {
+        $module = LearningModule::findOrFail($id);
+        return Storage::disk('public')->download($module->file_path, $module->file_name);
+    }
+}
