@@ -23,4 +23,14 @@ class LearningModule extends Model
     {
         return $this->belongsTo(TeachingAssignment::class);
     }
+
+    public function getFormattedFileSizeAttribute()
+    {
+        $bytes = $this->file_size;
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        for ($i = 0; $bytes > 1024; $i++) {
+            $bytes /= 1024;
+        }
+        return round($bytes, 2) . ' ' . $units[$i];
+    }
 }

@@ -4,24 +4,70 @@ namespace App\Http\Controllers\Backend\Dashboard;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\School;
+use App\Models\Teacher;
+use App\Models\Student;
+use App\Models\ClassRoom;
+use App\Models\TeachingAssignment;
+use App\Models\LearningModule;
+use App\Models\ClassStudent;
 
 class DashboardAdminController extends Controller
 {
     public function index()
     {
-        $stats = [
-            'schools' => \App\Models\School::count(),
-            'teachers' => \App\Models\Teacher::count(),
-            'students' => \App\Models\Student::count(),
-            'classes' => \App\Models\ClassRoom::count(),
-            'assignments' => \App\Models\TeachingAssignment::count(),
-        ];
+        $user = auth()->user();
+        
+        if ($user->hasRole('Superadmin')) {
+            $stats = [
+                'type' => 'admin',
+                'schools' => School::count(),
+                'teachers' => Teacher::count(),
+                'students' => Student::count(),
+                'classes' => ClassRoom::count(),
+            ];
 
-        $recentAssignments = \App\Models\TeachingAssignment::with(['teacher.user', 'classRoom', 'subject'])
-            ->latest()
-            ->take(5)
-            ->get();
+            $recentData = TeachingAssignment::with(['teacher.user', 'classRoom', 'subject'])
+                ->latest()
+                ->take(5)
+                ->get();
+        } elseif ($user->hasRole('Guru')) {
+            $teacherId = $user->teacher->id;
+            $stats = [
+                'type' => 'guru',
+                'my_classes' => TeachingAssignment::where('teacher_id', $teacherId)->distinct('class_room_id')->count(),
+                'my_subjects' => TeachingAssignment::where('teacher_id', $teacherId)->distinct('subject_id')->count(),
+                'my_modules' => LearningModule::whereHas('teachingAssignment', function($q) use ($teacherId) {
+                    $q->where('teacher_id', $teacherId);
+                })->count(),
+                'my_students' => ClassStudent::whereIn('class_room_id', function($q) use ($teacherId) {
+                    $q->select('class_room_id')->from('teaching_assignments')->where('teacher_id', $teacherId);
+                })->count(),
+            ];
 
-        return view('backend.dashboard.index', compact('stats', 'recentAssignments'));
+            $recentData = LearningModule::whereHas('teachingAssignment', function($q) use ($teacherId) {
+                $q->where('teacher_id', $teacherId);
+            })->with(['teachingAssignment.subject', 'teachingAssignment.classRoom'])->latest()->take(5)->get();
+        } else {
+            // Role Siswa
+            $student = $user->student;
+            $classId = ClassStudent::where('student_id', $student->id)
+                ->whereHas('academicYear', function($q) { $q->where('is_active', 1); })
+                ->value('class_room_id');
+
+            $stats = [
+                'type' => 'siswa',
+                'my_subjects' => TeachingAssignment::where('class_room_id', $classId)->count(),
+                'new_modules' => LearningModule::whereHas('teachingAssignment', function($q) use ($classId) {
+                    $q->where('class_room_id', $classId);
+                })->count(),
+            ];
+
+            $recentData = LearningModule::whereHas('teachingAssignment', function($q) use ($classId) {
+                $q->where('class_room_id', $classId);
+            })->with(['teachingAssignment.teacher.user', 'teachingAssignment.subject'])->latest()->take(5)->get();
+        }
+
+        return view('backend.dashboard.index', compact('stats', 'recentData'));
     }
 }

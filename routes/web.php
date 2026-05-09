@@ -30,14 +30,22 @@ use App\Http\Controllers\Backend\Settings\SettingController;
 |
 */
 
-// Halaman Depan (Langsung diarahkan ke Login)
-// Halaman Depan (Langsung diarahkan ke Login)
-Route::any('/', function () {
-    return redirect('/admin/login');
+// --- PORTAL SISWA (FRONTEND) ---
+Route::get('/login', [\App\Http\Controllers\Frontend\PortalController::class, 'login'])->name('student.login');
+Route::post('/login', [\App\Http\Controllers\Frontend\PortalController::class, 'authenticate'])->name('student.authenticate');
+
+Route::middleware(['auth', 'role:Siswa'])->group(function() {
+    Route::get('/student/dashboard', [\App\Http\Controllers\Frontend\PortalController::class, 'dashboard'])->name('student.dashboard');
 });
 
-Route::any('/dine-sync-pos', function () {
-    return redirect('/admin/login');
+Route::get('/', function () {
+    if (auth()->check()) {
+        if (auth()->user()->hasRole('Siswa')) {
+            return redirect()->route('student.dashboard');
+        }
+        return redirect()->route('dashboard');
+    }
+    return redirect()->route('student.login');
 });
 
 
@@ -113,6 +121,9 @@ Route::middleware(['auth', 'forbid-banned-user'])->group(function () {
     Route::resource('/admin/learning-modules', \App\Http\Controllers\Backend\Master\LearningModuleController::class);
     Route::get('/admin/learning-modules/{id}/download', [\App\Http\Controllers\Backend\Master\LearningModuleController::class, 'download'])->name('learning-modules.download');
     Route::resource('/admin/enrollments', \App\Http\Controllers\Backend\Master\ClassStudentController::class);
+    Route::resource('/admin/assignments', \App\Http\Controllers\Backend\Master\AssignmentController::class);
+    Route::post('/admin/assignments/submission/{submissionId}/score', [\App\Http\Controllers\Backend\Master\AssignmentController::class, 'score'])->name('assignments.score');
+    Route::post('/admin/assignments/{id}/submit', [\App\Http\Controllers\Backend\Master\AssignmentController::class, 'submit'])->name('assignments.submit');
     Route::post('/admin/settings/update', [SettingController::class, 'update'])->name('settings.update');
 
     // --- DEBUG/CHECK AUTH ---

@@ -81,6 +81,17 @@
 								</div>
 								<!--end:Menu item-->
 
+								<!--begin:Menu item-->
+								<div class="menu-item">
+									<a class="menu-link {{ request()->routeIs('assignments.*') ? 'active' : '' }}" href="{{ route('assignments.index') }}">
+										<span class="menu-icon">
+											<i class="ki-outline ki-notepad-edit fs-2"></i>
+										</span>
+										<span class="menu-title">Penugasan Siswa</span>
+									</a>
+								</div>
+								<!--end:Menu item-->
+
                                 @can('view_resources')
 								<!--begin:Menu item-->
 								<div class="menu-item">
@@ -111,6 +122,8 @@
 											<i class="ki-duotone ki-abstract-26 fs-2">
 												<span class="path1"></span>
 												<span class="path2"></span>
+												<span class="path3"></span>
+												<span class="path4"></span>
 											</i>
 										</span>
 										<span class="menu-title">Master LMS</span>
@@ -119,62 +132,13 @@
 									<!--end:Menu link-->
 									<!--begin:Menu sub-->
 									<div class="menu-sub menu-sub-accordion">
-										<!--begin:Menu item-->
-										<div class="menu-item">
-											<a class="menu-link {{ request()->routeIs('schools.*') ? 'active' : '' }}" href="{{ route('schools.index') }}">
-												<span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-												<span class="menu-title">Data Sekolah</span>
-											</a>
-										</div>
-										<!--end:Menu item-->
-										<!--begin:Menu item-->
-										<div class="menu-item">
-											<a class="menu-link {{ request()->routeIs('academic-years.*') ? 'active' : '' }}" href="{{ route('academic-years.index') }}">
-												<span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-												<span class="menu-title">Tahun Ajaran</span>
-											</a>
-										</div>
-										<!--end:Menu item-->
-										<!--begin:Menu item-->
-										<div class="menu-item">
-											<a class="menu-link {{ request()->routeIs('subjects.*') ? 'active' : '' }}" href="{{ route('subjects.index') }}">
-												<span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-												<span class="menu-title">Mata Pelajaran</span>
-											</a>
-										</div>
-										<!--end:Menu item-->
-										<!--begin:Menu item-->
-										<div class="menu-item">
-											<a class="menu-link {{ request()->routeIs('class-rooms.*') ? 'active' : '' }}" href="{{ route('class-rooms.index') }}">
-												<span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-												<span class="menu-title">Ruang Kelas</span>
-											</a>
-										</div>
-										<!--end:Menu item-->
-										<!--begin:Menu item-->
-										<div class="menu-item">
-											<a class="menu-link {{ request()->routeIs('teachers.*') ? 'active' : '' }}" href="{{ route('teachers.index') }}">
-												<span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-												<span class="menu-title">Data Guru</span>
-											</a>
-										</div>
-										<!--end:Menu item-->
-										<!--begin:Menu item-->
-										<div class="menu-item">
-											<a class="menu-link {{ request()->routeIs('students.*') ? 'active' : '' }}" href="{{ route('students.index') }}">
-												<span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-												<span class="menu-title">Data Siswa</span>
-											</a>
-										</div>
-										<!--end:Menu item-->
-										<!--begin:Menu item-->
-										<div class="menu-item">
-											<a class="menu-link {{ request()->routeIs('teaching-assignments.*') ? 'active' : '' }}" href="{{ route('teaching-assignments.index') }}">
-												<span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-												<span class="menu-title">Penugasan Guru</span>
-											</a>
-										</div>
-										<!--end:Menu item-->
+										<div class="menu-item"><a class="menu-link {{ request()->routeIs('schools.*') ? 'active' : '' }}" href="{{ route('schools.index') }}"><span class="menu-bullet"><span class="bullet bullet-dot"></span></span><span class="menu-title">Data Sekolah</span></a></div>
+										<div class="menu-item"><a class="menu-link {{ request()->routeIs('academic-years.*') ? 'active' : '' }}" href="{{ route('academic-years.index') }}"><span class="menu-bullet"><span class="bullet bullet-dot"></span></span><span class="menu-title">Tahun Ajaran</span></a></div>
+										<div class="menu-item"><a class="menu-link {{ request()->routeIs('subjects.*') ? 'active' : '' }}" href="{{ route('subjects.index') }}"><span class="menu-bullet"><span class="bullet bullet-dot"></span></span><span class="menu-title">Mata Pelajaran</span></a></div>
+										<div class="menu-item"><a class="menu-link {{ request()->routeIs('class-rooms.*') ? 'active' : '' }}" href="{{ route('class-rooms.index') }}"><span class="menu-bullet"><span class="bullet bullet-dot"></span></span><span class="menu-title">Ruang Kelas</span></a></div>
+										<div class="menu-item"><a class="menu-link {{ request()->routeIs('teachers.*') ? 'active' : '' }}" href="{{ route('teachers.index') }}"><span class="menu-bullet"><span class="bullet bullet-dot"></span></span><span class="menu-title">Data Guru</span></a></div>
+										<div class="menu-item"><a class="menu-link {{ request()->routeIs('students.*') ? 'active' : '' }}" href="{{ route('students.index') }}"><span class="menu-bullet"><span class="bullet bullet-dot"></span></span><span class="menu-title">Data Siswa</span></a></div>
+										<div class="menu-item"><a class="menu-link {{ request()->routeIs('teaching-assignments.*') ? 'active' : '' }}" href="{{ route('teaching-assignments.index') }}"><span class="menu-bullet"><span class="bullet bullet-dot"></span></span><span class="menu-title">Penugasan Guru</span></a></div>
 									</div>
 									<!--end:Menu sub-->
 								</div>
@@ -206,30 +170,8 @@
 									<!--end:Menu link-->
 									<!--begin:Menu sub-->
 									<div class="menu-sub menu-sub-accordion">
-										<!--begin:Menu item-->
-										<div class="menu-item">
-											<!--begin:Menu link-->
-											<a class="menu-link {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}">
-												<span class="menu-bullet">
-													<span class="bullet bullet-dot"></span>
-												</span>
-												<span class="menu-title">Users List</span>
-											</a>
-											<!--end:Menu link-->
-										</div>
-										<!--end:Menu item-->
-										<!--begin:Menu item-->
-										<div class="menu-item">
-											<!--begin:Menu link-->
-											<a class="menu-link {{ request()->routeIs('roles.*') ? 'active' : '' }}" href="{{ route('roles.index') }}">
-												<span class="menu-bullet">
-													<span class="bullet bullet-dot"></span>
-												</span>
-												<span class="menu-title">Roles & Permissions</span>
-											</a>
-											<!--end:Menu link-->
-										</div>
-										<!--end:Menu item-->
+										<div class="menu-item"><a class="menu-link {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}"><span class="menu-bullet"><span class="bullet bullet-dot"></span></span><span class="menu-title">Users List</span></a></div>
+										<div class="menu-item"><a class="menu-link {{ request()->routeIs('roles.*') ? 'active' : '' }}" href="{{ route('roles.index') }}"><span class="menu-bullet"><span class="bullet bullet-dot"></span></span><span class="menu-title">Roles & Permissions</span></a></div>
 									</div>
 									<!--end:Menu sub-->
 								</div>

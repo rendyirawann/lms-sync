@@ -15,7 +15,7 @@ class LearningModuleController extends Controller
         $user = auth()->user();
         $query = LearningModule::with(['teachingAssignment.teacher.user', 'teachingAssignment.subject', 'teachingAssignment.classRoom']);
 
-        if ($user->hasRole('guru')) {
+        if ($user->hasRole('Guru')) {
             // Guru hanya bisa melihat modul yang terikat dengan penugasannya
             if (!$user->teacher) {
                 return redirect()->route('dashboard')->with('error', 'Profil guru tidak ditemukan.');
@@ -35,9 +35,9 @@ class LearningModuleController extends Controller
             $assignments = TeachingAssignment::with(['teacher.user', 'subject', 'classRoom'])->get();
         }
 
-        $modules = $query->latest()->get();
+        $items = $query->latest()->get();
         
-        return view('backend.master.learning-modules.index', compact('modules', 'assignments'));
+        return view('backend.master.learning-modules.index', compact('items', 'assignments'));
     }
 
     public function store(Request $request)

@@ -27,24 +27,33 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request)
     {
-        // 1. PROSES LOGIN & RATE LIMITER (PENTING!)
-        // Kita panggil fungsi authenticate() dari LoginRequest.
-        // Di sinilah logic deteksi Email/WA/Nama DAN logic Lockout (10s, 15s) berjalan.
         $request->authenticate();
 
-        // 2. Regenerate Session (Keamanan standar)
         $request->session()->regenerate();
 
-        // 3. Ambil Data User
         $user = Auth::user();
 
-        // 4. Cek Status Banned (Double Check setelah login berhasil)
+        // 1. JIKA SISWA mencoba login di /admin/login -> Tendang ke /login
+        if ($user->hasRole('Siswa')) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Siswa silakan login melalui halaman khusus siswa.',
+                ], 403);
+            }
+            return redirect()->route('student.login')->with('error', 'Siswa silakan login melalui halaman khusus siswa.');
+        }
+
+        // 2. Cek Status Banned
         if ($user->banned_at) {
             Auth::guard('web')->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            // Respon jika banned
             if ($request->expectsJson()) {
                 return response()->json([
                     'status' => 'error',
@@ -56,37 +65,29 @@ class AuthenticatedSessionController extends Controller
             ]);
         }
 
-        // 5. Update Data User (IP & Last Login)
+        // 3. Update Data User
         $user->update([
-            'last_ip' => $request->ip(),
-            'last_login' => now(),
+            'last_login_at' => now(),
+            'last_login_ip' => $request->ip(),
         ]);
 
-        // 6. Catat Activity Log (Spatie + Agent)
-        $agent = new Agent;
+        // 4. Log Activity
         if (function_exists('activity')) {
+            $agent = new Agent;
             activity()
                 ->useLog('login')
                 ->causedBy($user)
                 ->withProperties([
                     'ip' => $request->ip(),
                     'agent' => [
-                        'browser' => $agent->browser() . ' ' . $agent->version($agent->browser()),
-                        'os' => $agent->platform() . ' ' . $agent->version($agent->platform()),
+                        'browser' => $agent->browser(),
+                        'os' => $agent->platform(),
                         'device' => $agent->device(),
-                        'is_mobile' => $agent->isMobile(),
-                        'is_desktop' => $agent->isDesktop(),
-                        'raw' => $request->header('User-Agent'),
-                    ],
-                    'request' => [
-                        'method' => $request->method(),
-                        'url' => $request->fullUrl(),
                     ],
                 ])
-                ->log('Login berhasil');
+                ->log('Login berhasil melalui halaman Admin');
         }
 
-        // 7. Return Response (Support JSON untuk Metronic)
         if ($request->expectsJson()) {
             return response()->json([
                 'status' => 'success',
@@ -95,10 +96,8 @@ class AuthenticatedSessionController extends Controller
             ], 200);
         }
 
-        // Redirect biasa
         return redirect()->intended(route('dashboard'));
     }
-
 
     /**
      * Destroy an authenticated session.
@@ -106,6 +105,7 @@ class AuthenticatedSessionController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         $user = Auth::user();
+        $isStudent = $user && $user->hasRole('Siswa');
         $agent = new Agent;
 
         // Catat Log Logout
@@ -116,16 +116,8 @@ class AuthenticatedSessionController extends Controller
                 ->withProperties([
                     'ip' => $request->ip(),
                     'agent' => [
-                        'browser' => $agent->browser() . ' ' . $agent->version($agent->browser()),
-                        'os' => $agent->platform() . ' ' . $agent->version($agent->platform()),
-                        'device' => $agent->device(),
-                        'is_mobile' => $agent->isMobile(),
-                        'is_desktop' => $agent->isDesktop(),
-                        'raw' => $request->header('User-Agent'),
-                    ],
-                    'request' => [
-                        'method' => $request->method(),
-                        'url' => $request->fullUrl(),
+                        'browser' => $agent->browser(),
+                        'os' => $agent->platform(),
                     ],
                 ])
                 ->log('Logout berhasil');
@@ -134,6 +126,10 @@ class AuthenticatedSessionController extends Controller
         Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
+        if ($isStudent) {
+            return redirect()->route('student.login');
+        }
 
         return redirect()->route('login');
     }

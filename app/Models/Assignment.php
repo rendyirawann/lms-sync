@@ -9,4 +9,14 @@ class Assignment extends Model
 {
     protected $guarded = [];
     use HasUuids;
+    
+    public function teachingAssignment()
+    {
+        return $this->belongsTo(TeachingAssignment::class);
+    }
+
+    public function submissions()
+    {
+        return $this->hasMany(AssignmentSubmission::class);
+    }
 }
