@@ -39,14 +39,8 @@ Route::middleware(['auth', 'role:Siswa'])->group(function() {
 });
 
 Route::get('/', function () {
-    if (auth()->check()) {
-        if (auth()->user()->hasRole('Siswa')) {
-            return redirect()->route('student.dashboard');
-        }
-        return redirect()->route('dashboard');
-    }
-    return redirect()->route('student.login');
-});
+    return view('frontend.landing.index');
+})->name('landing');
 
 
 
@@ -164,6 +158,21 @@ Route::middleware(['auth', 'forbid-banned-user'])->group(function () {
         Route::resource('/admin/log-activity', LogActivityController::class);
         Route::get('/admin/get-datalogactivity', [LogActivityController::class, 'getDataLogActivity'])->name('get-datalogactivity');
     });
+
+    // Akademik
+    Route::prefix('admin/academic')->group(function () {
+        Route::resource('schedules', \App\Http\Controllers\Backend\Academic\ScheduleController::class);
+        Route::resource('attendances', \App\Http\Controllers\Backend\Academic\AttendanceController::class);
+        Route::post('attendance-settings', [\App\Http\Controllers\Backend\Academic\AttendanceController::class, 'updateSettings'])->name('attendance-settings.update');
+    });
+});
+
+// Student Portal Routes
+Route::middleware(['auth', 'role:Siswa'])->prefix('portal')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Frontend\PortalController::class, 'dashboard'])->name('student.dashboard');
+    Route::get('/attendance', [\App\Http\Controllers\Frontend\AttendancePortalController::class, 'index'])->name('student.attendance');
+    Route::post('/attendance/submit', [\App\Http\Controllers\Frontend\AttendancePortalController::class, 'submit'])->name('student.attendance.submit');
+    Route::get('/timetable', [\App\Http\Controllers\Frontend\AttendancePortalController::class, 'timetable'])->name('student.timetable');
 });
 
 // Load Routes Authentication (Login, Register, Reset Password)

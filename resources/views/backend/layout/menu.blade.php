@@ -92,6 +92,54 @@
 								</div>
 								<!--end:Menu item-->
 
+                                @if(auth()->user()->hasRole('Superadmin') || auth()->user()->hasRole('Guru'))
+								<!--begin:Menu item-->
+								<div class="menu-item">
+									<a class="menu-link {{ request()->routeIs('schedules.*') ? 'active' : '' }}" href="{{ route('schedules.index') }}">
+										<span class="menu-icon">
+											<i class="ki-outline ki-calendar-8 fs-2"></i>
+										</span>
+										<span class="menu-title">Jadwal Pelajaran</span>
+									</a>
+								</div>
+								<!--end:Menu item-->
+
+								<!--begin:Menu item-->
+								<div class="menu-item">
+									<a class="menu-link {{ request()->routeIs('attendances.*') ? 'active' : '' }}" href="{{ route('attendances.index') }}">
+										<span class="menu-icon">
+											<i class="ki-outline ki-time fs-2"></i>
+										</span>
+										<span class="menu-title">Absensi Siswa</span>
+									</a>
+								</div>
+								<!--end:Menu item-->
+                                @endif
+
+                                @if(auth()->user()->hasRole('Siswa'))
+								<!--begin:Menu item-->
+								<div class="menu-item">
+									<a class="menu-link {{ request()->routeIs('student.attendance') ? 'active' : '' }}" href="{{ route('student.attendance') }}">
+										<span class="menu-icon">
+											<i class="ki-outline ki-fingerprint fs-2"></i>
+										</span>
+										<span class="menu-title">Absensi Saya</span>
+									</a>
+								</div>
+								<!--end:Menu item-->
+
+								<!--begin:Menu item-->
+								<div class="menu-item">
+									<a class="menu-link {{ request()->routeIs('student.timetable') ? 'active' : '' }}" href="{{ route('student.timetable') }}">
+										<span class="menu-icon">
+											<i class="ki-outline ki-calendar-tick fs-2"></i>
+										</span>
+										<span class="menu-title">Jadwal Pelajaran</span>
+									</a>
+								</div>
+								<!--end:Menu item-->
+                                @endif
+
                                 @can('view_resources')
 								<!--begin:Menu item-->
 								<div class="menu-item">

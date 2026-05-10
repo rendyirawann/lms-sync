@@ -11,6 +11,7 @@ use App\Models\Subject;
 use App\Models\ClassRoom;
 use App\Models\AcademicYear;
 use App\Models\TeachingAssignment;
+use App\Models\Schedule;
 use App\Models\ClassStudent;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -117,6 +118,24 @@ class DemoAccountSeeder extends Seeder
                     'academic_year_id' => $academicYear->id
                 ]
             );
+        }
+
+        // --- BUAT JADWAL DEMO ---
+        $assignment = TeachingAssignment::where('teacher_id', $teacher->id)->first();
+        if ($assignment) {
+            for ($i = 1; $i <= 5; $i++) {
+                Schedule::updateOrCreate(
+                    [
+                        'teaching_assignment_id' => $assignment->id,
+                        'day_of_week' => $i,
+                    ],
+                    [
+                        'start_time' => '08:00:00',
+                        'end_time' => '10:00:00',
+                        'is_active' => true
+                    ]
+                );
+            }
         }
 
         $this->command->info('Demo accounts & Plotting created successfully!');

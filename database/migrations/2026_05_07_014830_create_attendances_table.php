@@ -12,12 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('attendances', function (Blueprint $table) {
-
             $table->uuid('id')->primary();
-            $table->foreignUuid('teaching_assignment_id')->constrained('teaching_assignments')->onDelete('cascade');
-            $table->foreignUuid('student_id')->constrained('students')->onDelete('cascade');
-            $table->date('date');
-            $table->enum('status', ['hadir', 'sakit', 'izin', 'alpa']);
+            $table->foreignUuid('user_id')->constrained('users')->onDelete('cascade');
+            $table->enum('type', ['datang', 'pulang', 'mapel']);
+            $table->unsignedBigInteger('schedule_id')->nullable(); // Reference to schedules (standard bigint id)
+            $table->enum('status', ['hadir', 'terlambat', 'alfa', 'izin', 'sakit'])->default('hadir');
+            $table->text('note')->nullable();
+            $table->timestamp('attended_at')->nullable();
             $table->timestamps();
         });
     }

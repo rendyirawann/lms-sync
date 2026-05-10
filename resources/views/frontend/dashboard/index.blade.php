@@ -66,6 +66,44 @@
             </div>
         </div>
 
+        <!-- Attendance Status Bar -->
+        <div class="row g-5 mb-10">
+            <div class="col-12">
+                <div class="card shadow-sm border-0 bg-white">
+                    <div class="card-body d-flex flex-wrap align-items-center justify-content-between py-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="ki-outline ki-fingerprint fs-1 text-primary"></i>
+                            <div>
+                                <h4 class="mb-0 fw-bold">Status Absensi Hari Ini</h4>
+                                <p class="text-muted fs-8 mb-0">{{ date('l, d F Y') }}</p>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-4">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="bullet bullet-vertical h-30px bg-{{ $stats['attendance_status']['datang'] ? 'success' : 'secondary' }}"></span>
+                                <div class="d-flex flex-column">
+                                    <span class="fs-8 fw-bold text-gray-400 text-uppercase">Absen Datang</span>
+                                    <span class="fs-7 fw-bold text-{{ $stats['attendance_status']['datang'] ? 'success' : 'gray-400' }}">
+                                        {{ $stats['attendance_status']['datang'] ? 'Sudah Dilakukan' : 'Belum Absen' }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="bullet bullet-vertical h-30px bg-{{ $stats['attendance_status']['pulang'] ? 'success' : 'secondary' }}"></span>
+                                <div class="d-flex flex-column">
+                                    <span class="fs-8 fw-bold text-gray-400 text-uppercase">Absen Pulang</span>
+                                    <span class="fs-7 fw-bold text-{{ $stats['attendance_status']['pulang'] ? 'success' : 'gray-400' }}">
+                                        {{ $stats['attendance_status']['pulang'] ? 'Sudah Dilakukan' : 'Belum Tersedia' }}
+                                    </span>
+                                </div>
+                            </div>
+                            <a href="{{ route('student.attendance') }}" class="btn btn-sm btn-light-primary fw-bold ms-lg-5">Portal Absensi</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Quick Stats -->
         <div class="row g-5 g-xl-10 mb-10">
             <div class="col-md-4">

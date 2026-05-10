@@ -8,6 +8,8 @@ use App\Models\ClassStudent;
 use App\Models\TeachingAssignment;
 use App\Models\LearningModule;
 use App\Models\Assignment;
+use App\Models\Attendance;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class PortalController extends Controller
@@ -82,6 +84,10 @@ class PortalController extends Controller
             })->whereDoesntHave('submissions', function($q) use ($student) {
                 $q->where('student_id', $student->id);
             })->count(),
+            'attendance_status' => [
+                'datang' => Attendance::where('user_id', $user->id)->where('type', 'datang')->whereDate('created_at', Carbon::today())->exists(),
+                'pulang' => Attendance::where('user_id', $user->id)->where('type', 'pulang')->whereDate('created_at', Carbon::today())->exists(),
+            ]
         ];
 
         $recentModules = LearningModule::whereHas('teachingAssignment', function($q) use ($classId) {
