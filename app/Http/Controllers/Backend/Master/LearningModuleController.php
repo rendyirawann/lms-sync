@@ -30,6 +30,22 @@ class LearningModuleController extends Controller
             $assignments = TeachingAssignment::with(['subject', 'classRoom'])
                 ->where('teacher_id', $teacherId)
                 ->get();
+        } elseif ($user->hasRole('Siswa')) {
+            // Siswa hanya bisa melihat modul yang aktif di kelasnya
+            if (!$user->student) {
+                return redirect()->route('student.dashboard')->with('error', 'Profil siswa tidak ditemukan.');
+            }
+            
+            $studentId = $user->student->id;
+            $classId = \App\Models\ClassStudent::where('student_id', $studentId)
+                ->whereHas('academicYear', function($q) { $q->where('is_active', 1); })
+                ->value('class_room_id');
+
+            $query->whereHas('teachingAssignment', function($q) use ($classId) {
+                $q->where('class_room_id', $classId);
+            })->where('is_published', true);
+            
+            $assignments = []; // Siswa tidak menambah modul
         } else {
             // Superadmin bisa melihat dan menambah modul untuk siapa saja
             $assignments = TeachingAssignment::with(['teacher.user', 'subject', 'classRoom'])->get();

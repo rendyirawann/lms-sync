@@ -15,7 +15,8 @@ class Attendance extends Model
         'type',
         'schedule_id',
         'status',
-        'note',
+        'late_minutes',
+        'notes',
         'attended_at'
     ];
 

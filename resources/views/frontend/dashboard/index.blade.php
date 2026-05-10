@@ -1,5 +1,4 @@
-@extends('backend.layout.app') <!-- Kita masih pakai app layout tapi kita override isinya -->
-
+@extends('backend.layout.app')
 @section('title', 'Portal Siswa - Dashboard')
 
 @section('content')
@@ -58,8 +57,8 @@
                         Semangat belajar hari ini! Kamu memiliki <strong>{{ $stats['pending_assignments'] }} tugas</strong> yang belum dikerjakan. Ayo selesaikan tepat waktu!
                     </p>
                     <div class="d-flex gap-3">
-                        <a href="#" class="btn btn-white fw-bold px-6">Lihat Jadwal</a>
-                        <a href="#assignments-section" class="btn btn-outline btn-outline-white fw-bold px-6">Kerjakan Tugas</a>
+                        <a href="{{ route('student.timetable') }}" class="btn btn-white fw-bold px-6">Lihat Jadwal</a>
+                        <a href="{{ route('student.assignments.index') }}" class="btn btn-outline btn-outline-white fw-bold px-6">Kerjakan Tugas</a>
                     </div>
                 </div>
                 <img src="{{ URL::to('assets/media/illustrations/doofenshmirtz/2.png') }}" class="student-welcome-img d-none d-md-block" alt="">
@@ -157,7 +156,7 @@
                             <span class="text-muted mt-1 fw-semibold fs-7">Materi belajar terbaru dari bapak/ibu guru</span>
                         </h3>
                         <div class="card-toolbar">
-                            <a href="{{ route('learning-modules.index') }}" class="btn btn-sm btn-light-primary fw-bold">Lihat Semua</a>
+                            <a href="{{ route('student.learning-modules.index') }}" class="btn btn-sm btn-light-primary fw-bold">Lihat Semua</a>
                         </div>
                     </div>
                     <div class="card-body pt-3">
@@ -169,7 +168,7 @@
                                 </span>
                             </div>
                             <div class="flex-grow-1">
-                                <a href="#" class="text-gray-900 fw-bolder text-hover-primary fs-6">{{ $mod->title }}</a>
+                                <a href="{{ route('student.learning-modules.index') }}" class="text-gray-900 fw-bolder text-hover-primary fs-6">{{ $mod->title }}</a>
                                 <span class="text-muted d-block fw-semibold fs-7">{{ $mod->teachingAssignment->subject->name }} • {{ $mod->teachingAssignment->teacher->user->name }}</span>
                             </div>
                             <div class="badge badge-light-primary fw-bold">{{ $mod->formatted_file_size }}</div>
@@ -185,20 +184,21 @@
                     <div class="card-body p-8">
                         <h3 class="text-gray-900 fw-bolder mb-5">Pengumuman</h3>
                         <div class="timeline-label">
+                            @forelse($announcements as $ann)
                             <div class="timeline-item">
-                                <div class="timeline-label fw-bold text-gray-800 fs-6">08:42</div>
-                                <div class="timeline-badge">
-                                    <i class="fa fa-genderless text-warning fs-1"></i>
+                                <div class="timeline-label fw-bold text-gray-800 fs-7" style="width: 45px;">
+                                    {{ $ann['time']->isToday() ? $ann['time']->format('H:i') : ($ann['time']->isYesterday() ? 'Kemarin' : $ann['time']->format('d M')) }}
                                 </div>
-                                <div class="timeline-content fw-semibold text-gray-600 ps-3">Ujian Tengah Semester akan dilaksanakan minggu depan.</div>
-                            </div>
-                            <div class="timeline-item">
-                                <div class="timeline-label fw-bold text-gray-800 fs-6">Kemarin</div>
                                 <div class="timeline-badge">
-                                    <i class="fa fa-genderless text-success fs-1"></i>
+                                    <i class="fa fa-genderless text-{{ $ann['color'] }} fs-1"></i>
                                 </div>
-                                <div class="timeline-content fw-semibold text-gray-600 ps-3">Modul baru Bahasa Indonesia telah diunggah.</div>
+                                <div class="timeline-content fw-semibold text-gray-600 ps-3">{{ $ann['title'] }}</div>
                             </div>
+                            @empty
+                            <div class="text-center py-5">
+                                <span class="text-muted fs-7">Belum ada pengumuman terbaru.</span>
+                            </div>
+                            @endforelse
                         </div>
                     </div>
                 </div>

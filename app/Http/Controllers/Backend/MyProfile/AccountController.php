@@ -182,5 +182,52 @@ class AccountController extends Controller
 
     
 
-   
+    public function sendOtp(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user->hasRole('Siswa') || !$user->student) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $student = $user->student;
+        $type = $request->type; // 'email' or 'phone'
+        $otp = rand(100000, 999999);
+        
+        $student->parent_verification_code = $otp;
+        $student->save();
+
+        if ($type == 'email') {
+            if (!$student->parent_email) {
+                return response()->json(['error' => 'Parent email is not set.'], 422);
+            }
+            \Illuminate\Support\Facades\Mail::to($student->parent_email)->send(new \App\Mail\ParentVerificationOTP($otp, $user->name));
+            return response()->json(['success' => 'OTP has been sent to ' . $student->parent_email]);
+        } else {
+            // Placeholder for WhatsApp OTP
+            // For now, we simulate success
+            return response()->json(['success' => 'OTP simulation for WhatsApp sent to ' . $student->parent_phone . '. Code: ' . $otp]);
+        }
+    }
+
+    public function verifyOtp(Request $request)
+    {
+        $user = Auth::user();
+        $student = $user->student;
+        $code = $request->code;
+        $type = $request->type;
+
+        if ($student->parent_verification_code == $code) {
+            if ($type == 'email') {
+                $student->parent_email_verified_at = now();
+            } else {
+                $student->parent_phone_verified_at = now();
+            }
+            $student->parent_verification_code = null;
+            $student->save();
+
+            return response()->json(['success' => 'Verification successful!']);
+        }
+
+        return response()->json(['error' => 'Invalid verification code.'], 422);
+    }
 }

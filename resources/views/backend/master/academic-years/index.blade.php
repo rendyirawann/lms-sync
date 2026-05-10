@@ -39,7 +39,7 @@
                                     <button class="btn btn-sm btn-light-primary btn-active-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ $item->id }}">Edit</button>
                                     <form action="{{ route('academic-years.destroy', $item->id) }}" method="POST" class="d-inline">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-light-danger btn-active-danger" onclick="return confirm('Hapus data ini?')">Hapus</button>
+                                        <button type="submit" class="btn btn-sm btn-light-danger btn-active-danger confirm-delete" >Hapus</button>
                                     </form>
                                 </td>
                             </tr>
@@ -69,7 +69,7 @@
                                             </div>
                                             <div class="modal-footer flex-center">
                                                 <button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Batal</button>
-                                                <button type="submit" class="btn btn-primary">Simpan</button>
+                                                <button type="submit" class="btn btn-primary confirm-delete">Simpan</button>
                                             </div>
                                         </form>
                                     </div>
@@ -109,10 +109,36 @@
                 </div>
                 <div class="modal-footer flex-center">
                     <button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
+                    <button type="submit" class="btn btn-primary confirm-delete">Simpan</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    document.querySelectorAll('.confirm-delete').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = this.closest('form');
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data yang dihapus tidak dapat dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
+@endpush
+
 @endsection

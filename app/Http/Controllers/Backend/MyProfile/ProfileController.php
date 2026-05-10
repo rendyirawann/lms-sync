@@ -104,6 +104,23 @@ public function update(Request $request, $id)
         $user->email    = $request->email;
         $user->save();
 
+        if ($user->hasRole('Siswa') && $user->student) {
+            $student = $user->student;
+            
+            // Reset verification if email/phone changed
+            if ($request->parent_email != $student->parent_email) {
+                $student->parent_email_verified_at = null;
+            }
+            if ($request->parent_phone != $student->parent_phone) {
+                $student->parent_phone_verified_at = null;
+            }
+
+            $student->parent_name = $request->parent_name;
+            $student->parent_email = $request->parent_email;
+            $student->parent_phone = $request->parent_phone;
+            $student->save();
+        }
+
         // === SNAPSHOT NEW FULL ===
         $newData = $user->toArray();
 

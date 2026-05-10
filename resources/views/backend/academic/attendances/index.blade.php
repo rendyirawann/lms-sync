@@ -94,7 +94,13 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted">Belum ada log absensi hari ini.</td>
+                                    <td colspan="5">
+                                        <div class="text-center px-4 py-15">
+                                            <img src="{{ asset('assets/media/illustrations/sigma-1/5.png') }}" alt="" class="mw-100 mh-200px mb-7">
+                                            <h3 class="fw-bold text-gray-900 mb-2">Belum ada log absensi hari ini</h3>
+                                            <p class="text-gray-400 fs-6 fw-semibold">Data kehadiran siswa (Datang, Pulang, Mapel) akan muncul di sini setelah siswa melakukan absensi.</p>
+                                        </div>
+                                    </td>
                                 </tr>
                                 @endforelse
                             </tbody>

@@ -34,9 +34,9 @@ use App\Http\Controllers\Backend\Settings\SettingController;
 Route::get('/login', [\App\Http\Controllers\Frontend\PortalController::class, 'login'])->name('student.login');
 Route::post('/login', [\App\Http\Controllers\Frontend\PortalController::class, 'authenticate'])->name('student.authenticate');
 
-Route::middleware(['auth', 'role:Siswa'])->group(function() {
-    Route::get('/student/dashboard', [\App\Http\Controllers\Frontend\PortalController::class, 'dashboard'])->name('student.dashboard');
-});
+
+
+
 
 Route::get('/', function () {
     return view('frontend.landing.index');
@@ -163,6 +163,7 @@ Route::middleware(['auth', 'forbid-banned-user'])->group(function () {
     Route::prefix('admin/academic')->group(function () {
         Route::resource('schedules', \App\Http\Controllers\Backend\Academic\ScheduleController::class);
         Route::resource('attendances', \App\Http\Controllers\Backend\Academic\AttendanceController::class);
+        Route::get('attendance-settings', [\App\Http\Controllers\Backend\Academic\AttendanceController::class, 'index'])->name('attendance-settings.index');
         Route::post('attendance-settings', [\App\Http\Controllers\Backend\Academic\AttendanceController::class, 'updateSettings'])->name('attendance-settings.update');
     });
 });
@@ -173,6 +174,23 @@ Route::middleware(['auth', 'role:Siswa'])->prefix('portal')->group(function () {
     Route::get('/attendance', [\App\Http\Controllers\Frontend\AttendancePortalController::class, 'index'])->name('student.attendance');
     Route::post('/attendance/submit', [\App\Http\Controllers\Frontend\AttendancePortalController::class, 'submit'])->name('student.attendance.submit');
     Route::get('/timetable', [\App\Http\Controllers\Frontend\AttendancePortalController::class, 'timetable'])->name('student.timetable');
+    
+    // Portal Profile
+    Route::get('/my-account', [AccountController::class, 'index'])->name('student.account.index');
+    Route::post('/my-account/send-otp', [AccountController::class, 'sendOtp'])->name('student.parent.send-otp');
+    Route::post('/my-account/verify-otp', [AccountController::class, 'verifyOtp'])->name('student.parent.verify-otp');
+    Route::get('/my-account/{id}/avatar', [AccountController::class, 'editAvatar'])->name('student.avatar-edit');
+    Route::post('/my-account/{id}/update-avatar', [AccountController::class, 'updateAvatar'])->name('student.avatar-update');
+    Route::resource('/my-profile', ProfileController::class, ['as' => 'student']);
+    Route::resource('/my-security', SecurityController::class, ['as' => 'student']);
+
+    // Portal Akademik (Shared Controllers)
+    Route::get('/learning-modules', [\App\Http\Controllers\Backend\Master\LearningModuleController::class, 'index'])->name('student.learning-modules.index');
+    Route::get('/learning-modules/{id}/download', [\App\Http\Controllers\Backend\Master\LearningModuleController::class, 'download'])->name('student.learning-modules.download');
+    
+    Route::get('/assignments', [\App\Http\Controllers\Backend\Master\AssignmentController::class, 'index'])->name('student.assignments.index');
+    Route::get('/assignments/{id}', [\App\Http\Controllers\Backend\Master\AssignmentController::class, 'show'])->name('student.assignments.show');
+    Route::post('/assignments/{id}/submit', [\App\Http\Controllers\Backend\Master\AssignmentController::class, 'submit'])->name('student.assignments.submit');
 });
 
 // Load Routes Authentication (Login, Register, Reset Password)

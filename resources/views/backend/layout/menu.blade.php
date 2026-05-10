@@ -18,7 +18,10 @@
 								<!--begin:Menu item-->
 								<div class="menu-item">
 									<!--begin:Menu link-->
-									<a class="menu-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
+									@php
+										$dashboardRoute = auth()->user()->hasRole('Siswa') ? 'student.dashboard' : 'dashboard';
+									@endphp
+									<a class="menu-link {{ request()->routeIs($dashboardRoute) ? 'active' : '' }}" href="{{ route($dashboardRoute) }}">
 										<span class="menu-icon">
 											<i class="ki-duotone ki-element-11 fs-2">
 												<span class="path1"></span>
@@ -46,7 +49,10 @@
 								<!--begin:Menu item-->
 								<div class="menu-item">
 									<!--begin:Menu link-->
-									<a class="menu-link {{ request()->routeIs('account.index') ? 'active' : '' }}" href="{{ route('account.index') }}">
+									@php
+										$profileRoute = auth()->user()->hasRole('Siswa') ? 'student.account.index' : 'account.index';
+									@endphp
+									<a class="menu-link {{ request()->routeIs($profileRoute) ? 'active' : '' }}" href="{{ route($profileRoute) }}">
 										<span class="menu-icon">
 											<i class="ki-duotone ki-address-book fs-2">
 												<span class="path1"></span>
@@ -72,7 +78,10 @@
 
 								<!--begin:Menu item-->
 								<div class="menu-item">
-									<a class="menu-link {{ request()->routeIs('learning-modules.*') ? 'active' : '' }}" href="{{ route('learning-modules.index') }}">
+									@php
+										$moduleRoute = auth()->user()->hasRole('Siswa') ? 'student.learning-modules.index' : 'learning-modules.index';
+									@endphp
+									<a class="menu-link {{ request()->routeIs($moduleRoute) ? 'active' : '' }}" href="{{ route($moduleRoute) }}">
 										<span class="menu-icon">
 											<i class="ki-outline ki-book-open fs-2"></i>
 										</span>
@@ -83,7 +92,10 @@
 
 								<!--begin:Menu item-->
 								<div class="menu-item">
-									<a class="menu-link {{ request()->routeIs('assignments.*') ? 'active' : '' }}" href="{{ route('assignments.index') }}">
+									@php
+										$assignmentRoute = auth()->user()->hasRole('Siswa') ? 'student.assignments.index' : 'assignments.index';
+									@endphp
+									<a class="menu-link {{ request()->routeIs($assignmentRoute) ? 'active' : '' }}" href="{{ route($assignmentRoute) }}">
 										<span class="menu-icon">
 											<i class="ki-outline ki-notepad-edit fs-2"></i>
 										</span>
@@ -121,7 +133,7 @@
 								<div class="menu-item">
 									<a class="menu-link {{ request()->routeIs('student.attendance') ? 'active' : '' }}" href="{{ route('student.attendance') }}">
 										<span class="menu-icon">
-											<i class="ki-outline ki-fingerprint fs-2"></i>
+											<i class="ki-outline ki-time fs-2"></i>
 										</span>
 										<span class="menu-title">Absensi Saya</span>
 									</a>
@@ -226,6 +238,7 @@
 								<!--end:Menu item-->
 								@endcan
 
+								@if(!auth()->user()->hasRole('Siswa'))
 								<!--begin:Menu item-->
 								<div class="menu-item pt-5">
 									<!--begin:Menu content-->
@@ -251,6 +264,7 @@
 									<!--end:Menu link-->
 								</div>
 								<!--end:Menu item-->
+								@endif
 
 								@can('view_help')
 								<!--begin:Menu item-->

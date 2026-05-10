@@ -7,6 +7,7 @@ use App\Models\Attendance;
 use App\Models\AttendanceSetting;
 use App\Models\Schedule;
 use App\Models\TeachingAssignment;
+use App\Services\ParentNotificationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -46,24 +47,41 @@ class AttendancePortalController extends Controller
             })
             ->where('day_of_week', $dayOfWeek)
             ->where('is_active', true)
+            ->orderBy('start_time', 'asc')
             ->get();
 
         // Check which subjects have been attended
-        foreach ($schedules as $s) {
+        foreach ($schedules as $key => $s) {
             $s->is_attended = Attendance::where('user_id', $user->id)
                 ->where('type', 'mapel')
                 ->where('schedule_id', $s->id)
                 ->whereDate('created_at', $today)
-                ->exists();
+                ->first();
             
-            // Check if within time window
             $startTime = Carbon::createFromFormat('H:i:s', $s->start_time);
             $endTime = Carbon::createFromFormat('H:i:s', $s->end_time);
-            $s->can_attend = $now->between($startTime, $endTime);
-            $s->is_late = $now->gt($endTime);
+
+            // Logic: Can attend until next schedule starts
+            $nextS = $schedules->get($key + 1);
+            $limitTime = $nextS ? Carbon::createFromFormat('H:i:s', $nextS->start_time) : $endTime->copy()->addHours(2);
+
+            $s->can_attend = $now->between($startTime, $limitTime);
+            $s->is_late = $now->gt($limitTime);
+            $s->is_late_submission = $now->gt($endTime) && $now->lte($limitTime);
         }
 
-        return view('frontend.attendance.index', compact('settings', 'arrival', 'departure', 'schedules', 'now'));
+        // Arrival logic for view: can attend until departure starts
+        $arrivalStart = Carbon::createFromFormat('H:i:s', $settings->arrival_start);
+        $departureStart = Carbon::createFromFormat('H:i:s', $settings->departure_start);
+        $canAttendArrival = $now->between($arrivalStart, $departureStart);
+        $isArrivalLate = $now->gt(Carbon::createFromFormat('H:i:s', $settings->arrival_end)) && $now->lte($departureStart);
+
+        $history = Attendance::with(['schedule.teachingAssignment.subject'])
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('frontend.attendance.index', compact('settings', 'arrival', 'departure', 'schedules', 'now', 'canAttendArrival', 'isArrivalLate', 'history'));
     }
 
     public function submit(Request $request)
@@ -75,21 +93,51 @@ class AttendancePortalController extends Controller
         $settings = AttendanceSetting::first();
 
         if ($type == 'datang') {
-            $start = Carbon::createFromFormat('H:i:s', $settings->arrival_start);
-            $end = Carbon::createFromFormat('H:i:s', $settings->arrival_end);
-
-            if (!$now->between($start, $end)) {
-                return response()->json(['message' => 'Batas waktu absen datang adalah ' . $settings->arrival_start . ' - ' . $settings->arrival_end], 422);
+            // Check if already attended
+            $existing = Attendance::where('user_id', $user->id)->where('type', 'datang')->whereDate('created_at', $today)->first();
+            if ($existing) {
+                return response()->json(['message' => 'Anda sudah melakukan absen datang hari ini.'], 422);
             }
 
-            Attendance::create([
+            $start = Carbon::createFromFormat('H:i:s', $settings->arrival_start);
+            $end = Carbon::createFromFormat('H:i:s', $settings->arrival_end);
+            $departureStart = Carbon::createFromFormat('H:i:s', $settings->departure_start);
+
+            if ($now->lt($start)) {
+                return response()->json(['message' => 'Absen datang belum dimulai. Silahkan absen mulai jam ' . $settings->arrival_start], 422);
+            }
+
+            if ($now->gt($departureStart)) {
+                return response()->json(['message' => 'Sudah melewati batas waktu absen datang hari ini.'], 422);
+            }
+
+            $status = 'hadir';
+            $lateMinutes = 0;
+
+            if ($now->gt($end)) {
+                $status = 'terlambat';
+                $lateMinutes = $now->diffInMinutes($end);
+            }
+
+            $attendance = Attendance::create([
                 'user_id' => $user->id,
                 'type' => 'datang',
-                'status' => 'hadir',
-                'attended_at' => $now
+                'status' => $status,
+                'late_minutes' => $lateMinutes,
+                'attended_at' => $now,
+                'notes' => $status == 'terlambat' ? 'Terlambat ' . $lateMinutes . ' menit' : null
             ]);
+
+            // Send notification to parent
+            (new ParentNotificationService())->notifyAttendance($attendance);
+
         } 
         elseif ($type == 'pulang') {
+            $existing = Attendance::where('user_id', $user->id)->where('type', 'pulang')->whereDate('created_at', $today)->first();
+            if ($existing) {
+                return response()->json(['message' => 'Anda sudah melakukan absen pulang hari ini.'], 422);
+            }
+
             $arrival = Attendance::where('user_id', $user->id)->where('type', 'datang')->whereDate('created_at', $today)->first();
             if (!$arrival) {
                 return response()->json(['message' => 'Anda belum melakukan absen datang hari ini.'], 422);
@@ -100,31 +148,80 @@ class AttendancePortalController extends Controller
                 return response()->json(['message' => 'Absen pulang baru bisa dilakukan setelah jam ' . $settings->departure_start], 422);
             }
 
-            Attendance::create([
+            $attendance = Attendance::create([
                 'user_id' => $user->id,
                 'type' => 'pulang',
                 'status' => 'hadir',
                 'attended_at' => $now
             ]);
+
+            // Send notification to parent
+            (new ParentNotificationService())->notifyAttendance($attendance);
+
         } 
         elseif ($type == 'mapel') {
             $scheduleId = $request->schedule_id;
             $schedule = Schedule::findOrFail($scheduleId);
             
+            // Check if already attended
+            $existing = Attendance::where('user_id', $user->id)
+                ->where('type', 'mapel')
+                ->where('schedule_id', $scheduleId)
+                ->whereDate('created_at', $today)
+                ->first();
+            if ($existing) {
+                return response()->json(['message' => 'Anda sudah absen untuk mata pelajaran ini.'], 422);
+            }
+
             $startTime = Carbon::createFromFormat('H:i:s', $schedule->start_time);
             $endTime = Carbon::createFromFormat('H:i:s', $schedule->end_time);
 
-            if (!$now->between($startTime, $endTime)) {
-                return response()->json(['message' => 'Anda hanya bisa absen pada jam pelajaran berlangsung.'], 422);
+            // Find next schedule to determine limit
+            $student = $user->student;
+            $classIds = $student->classStudents->pluck('class_room_id');
+            $dayOfWeek = $now->dayOfWeekIso;
+
+            $nextSchedule = Schedule::whereIn('teaching_assignment_id', function($query) use ($classIds) {
+                    $query->select('id')
+                        ->from('teaching_assignments')
+                        ->whereIn('class_room_id', $classIds);
+                })
+                ->where('day_of_week', $dayOfWeek)
+                ->where('start_time', '>', $schedule->start_time)
+                ->where('is_active', true)
+                ->orderBy('start_time', 'asc')
+                ->first();
+
+            $limitTime = $nextSchedule ? Carbon::createFromFormat('H:i:s', $nextSchedule->start_time) : $endTime->copy()->addHours(2); // Fallback limit
+
+            if ($now->lt($startTime)) {
+                return response()->json(['message' => 'Jadwal mata pelajaran belum dimulai.'], 422);
             }
 
-            Attendance::create([
+            if ($now->gt($limitTime)) {
+                return response()->json(['message' => 'Sudah melewati batas waktu absen. Anda terhitung tidak hadir untuk mata pelajaran ini.'], 422);
+            }
+
+            $status = 'hadir';
+            $lateMinutes = 0;
+
+            if ($now->gt($endTime)) {
+                $status = 'terlambat';
+                $lateMinutes = $now->diffInMinutes($endTime);
+            }
+
+            $attendance = Attendance::create([
                 'user_id' => $user->id,
                 'type' => 'mapel',
                 'schedule_id' => $scheduleId,
-                'status' => 'hadir',
-                'attended_at' => $now
+                'status' => $status,
+                'late_minutes' => $lateMinutes,
+                'attended_at' => $now,
+                'notes' => $status == 'terlambat' ? 'Terlambat ' . $lateMinutes . ' menit' : null
             ]);
+
+            // Send notification to parent
+            (new ParentNotificationService())->notifyAttendance($attendance);
         }
 
         return response()->json(['message' => 'Absensi berhasil tercatat!']);

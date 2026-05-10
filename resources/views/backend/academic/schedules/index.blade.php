@@ -23,6 +23,11 @@
     <div class="post d-flex flex-column-fluid" id="kt_post">
         <div id="kt_content_container" class="container-xxl">
             <div class="card card-flush">
+                <div class="card-header border-0 pt-6">
+                    <div class="card-title">
+                        <h2>Daftar Jadwal Pelajaran</h2>
+                    </div>
+                </div>
                 <div class="card-body pt-0">
                     <div class="table-responsive">
                         <table class="table align-middle table-row-dashed fs-6 gy-5">
@@ -38,7 +43,7 @@
                                 </tr>
                             </thead>
                             <tbody class="fw-semibold text-gray-600">
-                                @foreach($schedules as $item)
+                                @forelse($schedules as $item)
                                 <tr>
                                     <td>
                                         <span class="badge badge-light-primary fw-bold">{{ $item->day_name }}</span>
@@ -66,7 +71,17 @@
                                         </form>
                                     </td>
                                 </tr>
-                                @endforeach
+                                @empty
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="text-center px-4 py-15">
+                                            <img src="{{ asset('assets/media/illustrations/sigma-1/5.png') }}" alt="" class="mw-100 mh-200px mb-7">
+                                            <h3 class="fw-bold text-gray-900 mb-2">Belum ada jadwal pelajaran</h3>
+                                            <p class="text-gray-400 fs-6 fw-semibold">Silakan tambahkan jadwal baru untuk menghubungkan mata pelajaran dengan hari dan waktu.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -173,5 +188,30 @@
     </div>
 </div>
 @endforeach
+
+@push('scripts')
+<script>
+    document.querySelectorAll('.confirm-delete').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = this.closest('form');
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data jadwal ini akan dihapus secara permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
+@endpush
 
 @endsection

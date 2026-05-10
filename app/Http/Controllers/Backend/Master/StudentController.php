@@ -57,6 +57,9 @@ class StudentController extends Controller
                 'phone' => $request->phone,
                 'gender' => $request->gender,
                 'address' => $request->address,
+                'parent_name' => $request->parent_name,
+                'parent_email' => $request->parent_email,
+                'parent_phone' => $request->parent_phone,
             ]);
             
             DB::commit();
@@ -96,6 +99,9 @@ class StudentController extends Controller
                 'phone' => $request->phone,
                 'gender' => $request->gender,
                 'address' => $request->address,
+                'parent_name' => $request->parent_name,
+                'parent_email' => $request->parent_email,
+                'parent_phone' => $request->parent_phone,
             ]);
             
             \DB::commit();

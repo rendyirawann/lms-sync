@@ -32,7 +32,7 @@
                             </tr>
                         </thead>
                         <tbody class="fs-6">
-                            @foreach($students as $item)
+                            @forelse($students as $item)
                             <tr>
                                 <td>{{ $item->nisn }}</td>
                                 <td>{{ $item->user->name ?? '-' }}</td>
@@ -41,18 +41,23 @@
                                 <td>{{ $item->gender == 'L' ? 'Laki-laki' : 'Perempuan' }}</td>
                                 <td class="text-end">
                                     <a href="#" class="btn btn-sm btn-light-primary btn-active-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ $item->id }}">Edit</a>
-                                        <form action="{{ route('students.destroy', $item->id) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('students.destroy', $item->id) }}" method="POST" class="d-inline">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-light-danger btn-active-danger" onclick="return confirm('Hapus siswa ini beserta akun loginnya?')">Hapus</button>
+                                        <button type="submit" class="btn btn-sm btn-light-danger btn-active-danger confirm-delete" >Hapus</button>
                                     </form>
                                 </td>
                             </tr>
-
-                            
-
-
-
-@endforeach
+                            @empty
+                            <tr>
+                                <td colspan="6">
+                                    <div class="text-center px-4 py-15">
+                                        <img src="{{ asset('assets/media/illustrations/sigma-1/5.png') }}" alt="" class="mw-100 mh-200px mb-7">
+                                        <h3 class="fw-bold text-gray-900 mb-2">Belum ada data siswa</h3>
+                                        <p class="text-gray-400 fs-6 fw-semibold">Daftar peserta didik belum tersedia di sistem. Silakan tambahkan akun siswa baru.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -101,10 +106,23 @@
                         </select>
                     </div>
                     <div class="fv-row mb-5"><label class="fs-6 fw-semibold mb-2">Alamat</label><textarea name="address" class="form-control form-control-solid"></textarea></div>
+
+                    <h5 class="mb-4 text-primary border-top pt-4">Data Orang Tua / Wali</h5>
+                    <div class="fv-row mb-5"><label class="fs-6 fw-semibold mb-2">Nama Orang Tua</label><input type="text" name="parent_name" class="form-control form-control-solid" placeholder="Contoh: Bpk. Heru"></div>
+                    <div class="row mb-5">
+                        <div class="col-md-6">
+                            <label class="fs-6 fw-semibold mb-2">Email Orang Tua</label>
+                            <input type="email" name="parent_email" class="form-control form-control-solid" placeholder="email@orangtua.com">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="fs-6 fw-semibold mb-2">No. WA Orang Tua</label>
+                            <input type="text" name="parent_phone" class="form-control form-control-solid" placeholder="0812xxxx">
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer flex-center">
                     <button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
+                    <button type="submit" class="btn btn-primary confirm-delete">Simpan</button>
                 </div>
             </form>
         </div>
@@ -151,10 +169,23 @@
                         </select>
                     </div>
                     <div class="fv-row mb-5"><label class="fs-6 fw-semibold mb-2">Alamat</label><textarea name="address" class="form-control form-control-solid">{{ $item->address }}</textarea></div>
+
+                    <h5 class="mb-4 text-primary border-top pt-4">Data Orang Tua / Wali</h5>
+                    <div class="fv-row mb-5"><label class="fs-6 fw-semibold mb-2">Nama Orang Tua</label><input type="text" name="parent_name" class="form-control form-control-solid" value="{{ $item->parent_name }}"></div>
+                    <div class="row mb-5">
+                        <div class="col-md-6">
+                            <label class="fs-6 fw-semibold mb-2">Email Orang Tua</label>
+                            <input type="email" name="parent_email" class="form-control form-control-solid" value="{{ $item->parent_email }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="fs-6 fw-semibold mb-2">No. WA Orang Tua</label>
+                            <input type="text" name="parent_phone" class="form-control form-control-solid" value="{{ $item->parent_phone }}">
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer flex-center">
                     <button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    <button type="submit" class="btn btn-primary confirm-delete">Simpan Perubahan</button>
                 </div>
             </form>
         </div>
@@ -162,5 +193,31 @@
 </div>
 
 @endforeach
+
+
+@push('scripts')
+<script>
+    document.querySelectorAll('.confirm-delete').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = this.closest('form');
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data yang dihapus tidak dapat dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
+@endpush
 
 @endsection

@@ -32,7 +32,7 @@
                             </tr>
                         </thead>
                         <tbody class="fs-6">
-                            @foreach($teachers as $item)
+                            @forelse($teachers as $item)
                             <tr>
                                 <td>{{ $item->nip }}</td>
                                 <td>{{ $item->user->name ?? '-' }}</td>
@@ -41,16 +41,23 @@
                                 <td>{{ $item->gender == 'L' ? 'Laki-laki' : 'Perempuan' }}</td>
                                 <td class="text-end">
                                     <a href="#" class="btn btn-sm btn-light-primary btn-active-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ $item->id }}">Edit</a>
-                                        <form action="{{ route('teachers.destroy', $item->id) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('teachers.destroy', $item->id) }}" method="POST" class="d-inline">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-light-danger btn-active-danger" onclick="return confirm('Menghapus guru ini akan menghapus akun loginnya juga. Lanjutkan?')">Hapus</button>
+                                        <button type="submit" class="btn btn-sm btn-light-danger btn-active-danger confirm-delete" >Hapus</button>
                                     </form>
                                 </td>
                             </tr>
-
-
-
-                            @endforeach
+                            @empty
+                            <tr>
+                                <td colspan="6">
+                                    <div class="text-center px-4 py-15">
+                                        <img src="{{ asset('assets/media/illustrations/sigma-1/5.png') }}" alt="" class="mw-100 mh-200px mb-7">
+                                        <h3 class="fw-bold text-gray-900 mb-2">Belum ada data guru</h3>
+                                        <p class="text-gray-400 fs-6 fw-semibold">Data tenaga pengajar belum terdaftar di sistem. Silakan tambahkan akun guru baru.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -93,7 +100,7 @@
                 </div>
                 <div class="modal-footer flex-center">
                     <button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
+                    <button type="submit" class="btn btn-primary confirm-delete">Simpan</button>
                 </div>
             </form>
         </div>
@@ -137,7 +144,7 @@
                 </div>
                 <div class="modal-footer flex-center">
                     <button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    <button type="submit" class="btn btn-primary confirm-delete">Simpan Perubahan</button>
                 </div>
             </form>
         </div>
@@ -145,5 +152,31 @@
 </div>
 
 @endforeach
+
+
+@push('scripts')
+<script>
+    document.querySelectorAll('.confirm-delete').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = this.closest('form');
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data yang dihapus tidak dapat dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
+@endpush
 
 @endsection

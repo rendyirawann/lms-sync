@@ -57,6 +57,46 @@
             </div>
             <!--end::Input group-->
 
+            @if(auth()->user()->hasRole('Siswa') && auth()->user()->student)
+            <div class="separator separator-dashed my-10"></div>
+            <h3 class="fw-bold mb-7">Parent Contact Information</h3>
+            
+            <div class="row mb-7">
+                <label class="col-lg-4 fw-semibold text-muted">Parent Name</label>
+                <div class="col-lg-8">
+                    <span class="fw-bold fs-6 text-gray-800">{{ auth()->user()->student->parent_name ?? '-' }}</span>
+                </div>
+            </div>
+
+            <div class="row mb-7">
+                <label class="col-lg-4 fw-semibold text-muted">Parent Email</label>
+                <div class="col-lg-8 d-flex align-items-center">
+                    <span class="fw-semibold text-gray-800 fs-6 me-2">{{ auth()->user()->student->parent_email ?? '-' }}</span>
+                    @if(auth()->user()->student->parent_email)
+                        @if(auth()->user()->student->parent_email_verified_at)
+                            <span class="badge badge-light-success fw-bold">Verified</span>
+                        @else
+                            <button class="btn btn-sm btn-light-warning py-1 px-2" id="VerifyParentEmail">Verify Now</button>
+                        @endif
+                    @endif
+                </div>
+            </div>
+
+            <div class="row mb-7">
+                <label class="col-lg-4 fw-semibold text-muted">Parent Phone (WA)</label>
+                <div class="col-lg-8 d-flex align-items-center">
+                    <span class="fw-semibold text-gray-800 fs-6 me-2">{{ auth()->user()->student->parent_phone ?? '-' }}</span>
+                    @if(auth()->user()->student->parent_phone)
+                        @if(auth()->user()->student->parent_phone_verified_at)
+                            <span class="badge badge-light-success fw-bold">Verified</span>
+                        @else
+                            <button class="btn btn-sm btn-light-warning py-1 px-2" id="VerifyParentPhone">Verify Now</button>
+                        @endif
+                    @endif
+                </div>
+            </div>
+            @endif
+
 
         </div>
         <!--end::Card body-->

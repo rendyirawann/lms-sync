@@ -162,6 +162,40 @@
         </div>
     </div>
 
+    <!-- OTP Verification Modal -->
+    <div class="modal fade" id="Modal_Verify_Parent" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered mw-450px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="fw-bold">Verify Parent Contact</h2>
+                    <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal">
+                        <i class="ki-outline ki-cross fs-1"></i>
+                    </div>
+                </div>
+                <div class="modal-body px-10 py-10">
+                    <form id="FormVerifyOTP">
+                        @csrf
+                        <input type="hidden" name="type" id="verify_type">
+                        <div class="text-center mb-10">
+                            <img alt="Logo" class="mh-125px mb-7" src="{{ asset('assets/media/svg/misc/smartphone-2.svg') }}" />
+                            <div class="fw-bold fs-3 mb-2">Two-Step Verification</div>
+                            <div class="text-muted fw-semibold fs-5">Enter the verification code we sent to your parent contact.</div>
+                        </div>
+                        <div class="fv-row mb-10">
+                            <input type="text" name="code" class="form-control form-control-solid text-center fw-bold fs-2qx h-60px" placeholder="000000" maxlength="6" autocomplete="off" />
+                        </div>
+                        <div class="text-center mt-10">
+                            <button type="submit" class="btn btn-primary w-100" id="btn-verify-otp">
+                                <span class="indicator-label">Verify Code</span>
+                                <span class="indicator-progress">Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="Modal_Edit_Profile" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered mw-650px">
@@ -403,9 +437,76 @@
 
             });
 
-            // ==============================================
-            // 3. FUNGSI MOUSE DRAG MODAL (Agar modal bisa digeser)
-            // ==============================================
+                // ==============================================
+                // 3. FUNGSI VERIFIKASI ORANG TUA
+                // ==============================================
+                $('body').on('click', '#VerifyParentEmail', function(e) {
+                    e.preventDefault();
+                    sendOTP('email');
+                });
+
+                $('body').on('click', '#VerifyParentPhone', function(e) {
+                    e.preventDefault();
+                    sendOTP('phone');
+                });
+
+                function sendOTP(type) {
+                    Swal.fire({
+                        title: 'Kirim Kode Verifikasi?',
+                        text: "Kami akan mengirimkan kode OTP ke kontak orang tua (" + type + ")",
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, Kirim!',
+                        showLoaderOnConfirm: true,
+                        preConfirm: () => {
+                            return $.ajax({
+                                url: "{{ route('student.parent.send-otp') }}",
+                                type: "POST",
+                                data: { _token: "{{ csrf_token() }}", type: type },
+                                dataType: "json"
+                            }).catch(error => {
+                                Swal.showValidationMessage(`Request failed: ${error.responseJSON.error}`);
+                            });
+                        },
+                        allowOutsideClick: () => !Swal.isLoading()
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $('#verify_type').val(type);
+                            $('#Modal_Verify_Parent').modal('show');
+                            Swal.fire('Terkirim!', result.value.success, 'success');
+                        }
+                    });
+                }
+
+                $('#FormVerifyOTP').on('submit', function(e) {
+                    e.preventDefault();
+                    var submitBtn = document.querySelector("#btn-verify-otp");
+                    submitBtn.setAttribute("data-kt-indicator", "on");
+                    submitBtn.disabled = true;
+
+                    $.ajax({
+                        url: "{{ route('student.parent.verify-otp') }}",
+                        type: "POST",
+                        data: $(this).serialize(),
+                        success: function(res) {
+                            submitBtn.removeAttribute("data-kt-indicator");
+                            submitBtn.disabled = false;
+                            $('#Modal_Verify_Parent').modal('hide');
+                            Swal.fire('Berhasil!', res.success, 'success').then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function(xhr) {
+                            submitBtn.removeAttribute("data-kt-indicator");
+                            submitBtn.disabled = false;
+                            Swal.fire('Gagal', xhr.responseJSON.error, 'error');
+                        }
+                    });
+                });
+
+                // ==============================================
+                // 4. FUNGSI MOUSE DRAG MODAL (Agar modal bisa digeser)
+                // ==============================================
             document.querySelectorAll('.modal').forEach(function(element) {
                 dragElement(element);
 

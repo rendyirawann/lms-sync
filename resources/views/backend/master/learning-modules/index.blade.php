@@ -4,14 +4,9 @@
 
 <!--begin::Toolbar-->
 <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
-    <!--begin::Toolbar container-->
     <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
-        <!--begin::Page title-->
         <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
-            <!--begin::Title-->
             <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Modul Pembelajaran</h1>
-            <!--end::Title-->
-            <!--begin::Breadcrumb-->
             <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
                 <li class="breadcrumb-item text-muted">
                     <a href="{{ route('dashboard') }}" class="text-muted text-hover-primary">Home</a>
@@ -25,10 +20,7 @@
                 </li>
                 <li class="breadcrumb-item text-muted">Modul Digital</li>
             </ul>
-            <!--end::Breadcrumb-->
         </div>
-        <!--end::Page title-->
-        <!--begin::Actions-->
         <div class="d-flex align-items-center gap-2 gap-lg-3">
             @hasanyrole('Superadmin|Guru')
             <button type="button" class="btn btn-sm fw-bold btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
@@ -36,25 +28,18 @@
             </button>
             @endhasanyrole
         </div>
-        <!--end::Actions-->
     </div>
-    <!--end::Toolbar container-->
 </div>
-<!--end::Toolbar-->
 
-<!--begin::Content-->
 <div id="kt_app_content" class="app-content flex-column-fluid">
-    <!--begin::Content container-->
-    <div id="kt_app_content_container" class="app-container container-xxl">
-        <!-- Header Konten -->
+    <div class="app-container container-xxl">
         <div class="mb-10">
             <h1 class="text-gray-900 fw-bold mb-1">Perpustakaan Modul Digital</h1>
             <div class="text-muted fw-semibold fs-6">Kumpulan materi belajar dan modul pendukung untuk membantu proses pembelajaran siswa</div>
         </div>
         
-        <!-- Library Grid -->
         <div class="row g-6 g-xl-9">
-            @foreach($items as $item)
+            @forelse($items as $item)
             <div class="col-md-6 col-lg-4 col-xl-3">
                 <div class="card h-100 card-custom border-0 shadow-sm overflow-hidden card-hover">
                     @php
@@ -63,7 +48,6 @@
                         $extension = strtolower(pathinfo($item->file_path, PATHINFO_EXTENSION));
                         $fileUrl = Storage::url($item->file_path);
                     @endphp
-                    <!-- Book Cover -->
                     <div class="position-relative d-flex flex-center h-200px w-100" style="background-color: {{ $bgColor }};">
                         <div class="text-center p-5">
                             <i class="ki-outline ki-file-text fs-5x text-white opacity-25 position-absolute top-50 start-50 translate-middle"></i>
@@ -74,7 +58,6 @@
                         </div>
                     </div>
 
-                    <!-- Book Body -->
                     <div class="card-body p-6">
                         <div class="mb-5">
                             <div class="d-flex align-items-center mb-1">
@@ -95,17 +78,14 @@
                         </div>
                     </div>
 
-                    <!-- Book Footer / Actions -->
                     <div class="card-footer p-2 border-0 bg-light-dark bg-opacity-10">
                         <div class="d-flex justify-content-between align-items-center px-2">
                             <div class="d-flex gap-1">
-                                <!-- Tombol Preview -->
                                 <button type="button" class="btn btn-sm btn-icon btn-light-primary" 
                                     onclick="initViewer('{{ $fileUrl }}', '{{ $extension }}', '{{ $item->title }}')" 
                                     title="Pratinjau Modul">
                                     <i class="ki-outline ki-eye fs-2"></i>
                                 </button>
-                                <!-- Tombol Download -->
                                 <a href="{{ route('learning-modules.download', $item->id) }}" class="btn btn-sm btn-icon btn-primary" title="Download">
                                     <i class="ki-outline ki-cloud-download fs-2"></i>
                                 </a>
@@ -117,7 +97,7 @@
                                 </button>
                                 <form action="{{ route('learning-modules.destroy', $item->id) }}" method="POST" class="d-inline">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-icon btn-light-danger" onclick="return confirm('Hapus modul ini?')">
+                                    <button type="submit" class="btn btn-sm btn-icon btn-light-danger confirm-delete" >
                                         <i class="ki-outline ki-trash fs-2"></i>
                                     </button>
                                 </form>
@@ -127,23 +107,27 @@
                     </div>
                 </div>
             </div>
-            @endforeach
-
-            @if($items->isEmpty())
+            @empty
             <div class="col-12">
-                <div class="card p-20 text-center border-dashed border-gray-300">
-                    <div class="mb-5">
-                        <i class="ki-outline ki-book-open fs-5x text-gray-300"></i>
-                    </div>
-                    <h3 class="text-gray-600 fw-bold">Belum ada modul di perpustakaan</h3>
+                <div class="card border-dashed border-gray-300">
+                                <div class="card-header mt-5 border-0 pt-6">
+                <div class="card-title flex-column">
+                    <h3 class="fw-bold mb-1">Daftar Modul Pembelajaran</h3>
                 </div>
             </div>
-            @endif
+            <div class="card-body">
+                        <div class="text-center px-4 py-15">
+                            <img src="{{ asset('assets/media/illustrations/sigma-1/5.png') }}" alt="" class="mw-100 mh-200px mb-7">
+                            <h3 class="fw-bold text-gray-900 mb-2">Belum ada modul di perpustakaan</h3>
+                            <p class="text-gray-400 fs-6 fw-semibold">Kumpulan materi belajar dan modul pendukung untuk membantu proses pembelajaran siswa belum tersedia.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endforelse
         </div>
     </div>
-    <!--end::Content container-->
 </div>
-<!--end::Content-->
 
 <!-- Modal Preview Modul -->
 <div class="modal fade" id="modal_viewer" tabindex="-1" aria-hidden="true">
@@ -156,7 +140,6 @@
                 </div>
             </div>
             <div class="modal-body bg-light p-0 position-relative overflow-hidden">
-                <!-- PDF View -->
                 <div id="pdf-viewer-container" class="viewer-section d-none h-100 flex-column">
                     <div class="d-flex flex-center bg-dark p-2 gap-5 z-index-2 position-sticky top-0 shadow-sm">
                         <button id="prevPage" class="btn btn-sm btn-icon btn-light-dark btn-active-color-primary"><i class="ki-outline ki-arrow-left fs-2"></i></button>
@@ -168,13 +151,9 @@
                         <canvas id="pdf-render" class="shadow-lg bg-white"></canvas>
                     </div>
                 </div>
-
-                <!-- Office View (Word/Excel) -->
                 <div id="office-viewer-container" class="viewer-section d-none h-100 overflow-auto p-10 bg-white">
                     <div id="office-render" class="mw-800px mx-auto"></div>
                 </div>
-
-                <!-- Fallback Message -->
                 <div id="fallback-viewer" class="viewer-section d-none h-100 flex-center">
                     <div class="text-center">
                         <i class="ki-outline ki-information-5 fs-5x text-warning mb-5"></i>
@@ -187,33 +166,21 @@
     </div>
 </div>
 
-<!-- Scripts for Viewing -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-
-    let pdfDoc = null;
-    let currentPage = 1;
-    let pageRendering = false;
-    let pageNumPending = null;
+    let pdfDoc = null, currentPage = 1, pageRendering = false, pageNumPending = null;
 
     function initViewer(url, ext, title) {
         document.getElementById('viewer_title').textContent = title;
         document.querySelectorAll('.viewer-section').forEach(el => el.classList.add('d-none'));
-        
-        if (ext === 'pdf') {
-            loadPdf(url);
-        } else if (ext === 'docx' || ext === 'doc') {
-            loadWord(url);
-        } else if (ext === 'xlsx' || ext === 'xls') {
-            loadExcel(url);
-        } else {
-            document.getElementById('fallback-viewer').classList.remove('d-none');
-        }
-        
+        if (ext === 'pdf') loadPdf(url);
+        else if (ext === 'docx' || ext === 'doc') loadWord(url);
+        else if (ext === 'xlsx' || ext === 'xls') loadExcel(url);
+        else document.getElementById('fallback-viewer').classList.remove('d-none');
         $('#modal_viewer').modal('show');
     }
 
@@ -222,74 +189,42 @@
         const canvas = document.getElementById('pdf-render');
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        pdfjsLib.getDocument(url).promise.then(pdf => {
-            pdfDoc = pdf;
-            currentPage = 1;
-            renderPdfPage(1);
-        });
+        pdfjsLib.getDocument(url).promise.then(pdf => { pdfDoc = pdf; renderPdfPage(1); });
     }
 
     function renderPdfPage(num) {
         pageRendering = true;
         document.querySelector('.pdf-loader').classList.remove('d-none');
-
         pdfDoc.getPage(num).then(page => {
             const viewport = page.getViewport({ scale: 1.5 });
             const canvas = document.getElementById('pdf-render');
-            const ctx = canvas.getContext('2d');
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-
-            const renderContext = { canvasContext: ctx, viewport: viewport };
-            page.render(renderContext).promise.then(() => {
+            canvas.height = viewport.height; canvas.width = viewport.width;
+            page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise.then(() => {
                 pageRendering = false;
                 document.querySelector('.pdf-loader').classList.add('d-none');
                 document.getElementById('pageNum').textContent = `Halaman ${num} / ${pdfDoc.numPages}`;
-                if (pageNumPending !== null) {
-                    renderPdfPage(pageNumPending);
-                    pageNumPending = null;
-                }
             });
         });
     }
 
-    document.getElementById('prevPage').addEventListener('click', () => {
-        if (currentPage <= 1 || !pdfDoc) return;
-        currentPage--;
-        renderPdfPage(currentPage);
-    });
-
-    document.getElementById('nextPage').addEventListener('click', () => {
-        if (!pdfDoc || currentPage >= pdfDoc.numPages) return;
-        currentPage++;
-        renderPdfPage(currentPage);
-    });
+    document.getElementById('prevPage').addEventListener('click', () => { if (currentPage <= 1) return; currentPage--; renderPdfPage(currentPage); });
+    document.getElementById('nextPage').addEventListener('click', () => { if (currentPage >= pdfDoc.numPages) return; currentPage++; renderPdfPage(currentPage); });
 
     function loadWord(url) {
         document.getElementById('office-viewer-container').classList.remove('d-none');
-        document.getElementById('office-render').innerHTML = '<div class="d-flex flex-center py-20"><div class="spinner-border text-primary"></div><span class="ms-3 fw-bold">Memuat dokumen...</span></div>';
-        
         fetch(url).then(res => res.arrayBuffer()).then(buffer => {
             mammoth.convertToHtml({arrayBuffer: buffer}).then(result => {
                 document.getElementById('office-render').innerHTML = `<div class="p-10 shadow-sm bg-white rounded">${result.value}</div>`;
             });
-        }).catch(err => {
-            document.getElementById('office-render').innerHTML = '<div class="alert alert-danger">Gagal memuat dokumen Word.</div>';
         });
     }
 
     function loadExcel(url) {
         document.getElementById('office-viewer-container').classList.remove('d-none');
-        document.getElementById('office-render').innerHTML = '<div class="d-flex flex-center py-20"><div class="spinner-border text-primary"></div><span class="ms-3 fw-bold">Memuat spreadsheet...</span></div>';
-        
         fetch(url).then(res => res.arrayBuffer()).then(buffer => {
             const wb = XLSX.read(buffer, {type: 'array'});
-            const firstSheet = wb.SheetNames[0];
-            const html = XLSX.utils.sheet_to_html(wb.Sheets[firstSheet]);
+            const html = XLSX.utils.sheet_to_html(wb.Sheets[wb.SheetNames[0]]);
             document.getElementById('office-render').innerHTML = `<div class="table-responsive p-5 bg-white rounded shadow-sm">${html}</div>`;
-            const table = document.querySelector('#office-render table');
-            if(table) table.classList.add('table', 'table-bordered', 'table-striped', 'align-middle');
         });
     }
 </script>
@@ -324,30 +259,19 @@
                     </div>
                     <div class="fv-row mb-7">
                         <label class="required fs-6 fw-semibold mb-2">Judul Modul</label>
-                        <input type="text" name="title" class="form-control form-control-solid" placeholder="Contoh: Materi Dasar Aljabar" required>
+                        <input type="text" name="title" class="form-control form-control-solid" required>
                     </div>
                     <div class="fv-row mb-7">
                         <label class="fs-6 fw-semibold mb-2">Deskripsi (Opsional)</label>
-                        <textarea name="description" class="form-control form-control-solid" rows="3" placeholder="Jelaskan isi modul secara singkat"></textarea>
+                        <textarea name="description" class="form-control form-control-solid" rows="3"></textarea>
                     </div>
                     <div class="fv-row mb-10">
                         <label class="required fs-6 fw-semibold mb-2">Pilih File Modul</label>
                         <input type="file" name="file" class="form-control form-control-solid" required>
-                        <div class="form-text">Format: PDF, Word, Excel, PPT. Maksimal 20MB.</div>
-                    </div>
-                    <div class="d-flex flex-stack">
-                        <div class="me-5">
-                            <label class="fs-6 fw-semibold">Publikasikan Langsung</label>
-                            <div class="fs-7 fw-semibold text-muted">Aktifkan agar modul langsung dapat dilihat siswa</div>
-                        </div>
-                        <label class="form-check form-switch form-check-custom form-check-solid">
-                            <input class="form-check-input" type="checkbox" name="is_published" value="1" checked="checked" />
-                        </label>
                     </div>
                 </div>
                 <div class="modal-footer flex-center">
-                    <button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Unggah Modul</button>
+                    <button type="submit" class="btn btn-primary confirm-delete">Unggah Modul</button>
                 </div>
             </form>
         </div>
@@ -355,11 +279,10 @@
 </div>
 
 @foreach($items as $item)
-<!-- Edit Modal -->
 <div class="modal fade drawer-modal" id="editModal{{ $item->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog mw-650px">
         <div class="modal-content">
-            <form action="{{ route('learning-modules.update', $item->id) }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('learning-modules.update', $item->id) }}" method="POST">
                 @csrf @method('PUT')
                 <div class="modal-header">
                     <h2 class="fw-bold">Edit Modul</h2>
@@ -372,19 +295,40 @@
                         <label class="required fs-6 fw-semibold mb-2">Judul Modul</label>
                         <input type="text" name="title" class="form-control form-control-solid" value="{{ $item->title }}" required>
                     </div>
-                    <div class="fv-row mb-7">
-                        <label class="fs-6 fw-semibold mb-2">Deskripsi</label>
-                        <textarea name="description" class="form-control form-control-solid" rows="3">{{ $item->description }}</textarea>
-                    </div>
                 </div>
                 <div class="modal-footer flex-center">
-                    <button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    <button type="submit" class="btn btn-primary confirm-delete">Simpan Perubahan</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 @endforeach
+
+
+@push('scripts')
+<script>
+    document.querySelectorAll('.confirm-delete').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = this.closest('form');
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data yang dihapus tidak dapat dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
+@endpush
 
 @endsection

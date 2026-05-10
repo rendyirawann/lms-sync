@@ -1,5 +1,4 @@
 @extends('backend.layout.app')
-
 @section('content')
 <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
     <div class="toolbar" id="kt_toolbar">
@@ -26,13 +25,22 @@
                         </div>
                         <div class="card-body d-flex flex-column justify-content-end pr-0">
                             @if($arrival)
-                                <div class="d-flex align-items-center mb-2">
-                                    <span class="badge badge-success fs-7 fw-bold">TERABSENSI: {{ $arrival->attended_at->format('H:i') }}</span>
+                                <div class="d-flex flex-column mb-2">
+                                    <span class="badge badge-success fs-7 fw-bold mb-1">TERABSENSI: {{ $arrival->attended_at->format('H:i') }}</span>
+                                    @if($arrival->status == 'terlambat')
+                                        <span class="badge badge-warning fs-8">TERLAMBAT {{ $arrival->late_minutes }} MENIT</span>
+                                    @endif
                                 </div>
                             @else
-                                <button class="btn btn-primary w-100 btn-absensi" data-type="datang">
-                                    <i class="ki-outline ki-entrance-left fs-2"></i> Absen Datang Sekarang
-                                </button>
+                                @if($canAttendArrival)
+                                    <button class="btn btn-primary w-100 btn-absensi" data-type="datang">
+                                        <i class="ki-outline ki-entrance-left fs-2"></i> {{ $isArrivalLate ? 'Absen Datang (Terlambat)' : 'Absen Datang Sekarang' }}
+                                    </button>
+                                @else
+                                    <button class="btn btn-secondary w-100" disabled>
+                                        <i class="ki-outline ki-lock fs-2"></i> Waktu Absen Berakhir
+                                    </button>
+                                @endif
                             @endif
                         </div>
                     </div>
@@ -107,10 +115,15 @@
                                     <td>{{ $s->teachingAssignment->teacher->user->name }}</td>
                                     <td class="text-end">
                                         @if($s->is_attended)
-                                            <span class="badge badge-light-success px-4 py-3">Sudah Absen</span>
+                                            <div class="d-flex flex-column align-items-end">
+                                                <span class="badge badge-light-success px-4 py-3">Sudah Absen</span>
+                                                @if($s->is_attended->status == 'terlambat')
+                                                    <span class="fs-8 text-warning fw-bold mt-1">Terlambat {{ $s->is_attended->late_minutes }}m</span>
+                                                @endif
+                                            </div>
                                         @elseif($s->can_attend)
-                                            <button class="btn btn-sm btn-light-primary btn-absensi" data-type="mapel" data-id="{{ $s->id }}">
-                                                <i class="ki-outline ki-check-circle fs-2"></i> Klik Untuk Absen
+                                            <button class="btn btn-sm {{ $s->is_late_submission ? 'btn-light-warning' : 'btn-light-primary' }} btn-absensi" data-type="mapel" data-id="{{ $s->id }}">
+                                                <i class="ki-outline ki-check-circle fs-2"></i> {{ $s->is_late_submission ? 'Absen (Terlambat)' : 'Klik Untuk Absen' }}
                                             </button>
                                         @elseif($s->is_late)
                                             <span class="badge badge-light-danger px-4 py-3">Waktu Terlewat</span>
@@ -132,11 +145,79 @@
                     </div>
                 </div>
             </div>
+            <!-- History Attendance Section -->
+            <div class="card card-flush mt-10">
+                <div class="card-header border-0 pt-6">
+                    <div class="card-title">
+                        <h2>Riwayat Absensi Saya</h2>
+                    </div>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="table-responsive">
+                        <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_attendance_history_table">
+                            <thead>
+                                <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                    <th>Tanggal</th>
+                                    <th>Tipe Absensi</th>
+                                    <th>Status</th>
+                                    <th>Waktu Absen</th>
+                                    <th>Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody class="fw-semibold text-gray-600">
+                                @foreach($history as $h)
+                                <tr>
+                                    <td>{{ $h->created_at->format('d M Y') }}</td>
+                                    <td>
+                                        @if($h->type == 'datang')
+                                            <span class="badge badge-light-primary">Datang</span>
+                                        @elseif($h->type == 'pulang')
+                                            <span class="badge badge-light-danger">Pulang</span>
+                                        @else
+                                            <span class="badge badge-light-info">Pelajaran ({{ $h->schedule->teachingAssignment->subject->name ?? '-' }})</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($h->status == 'hadir')
+                                            <span class="badge badge-success">Hadir</span>
+                                        @elseif($h->status == 'terlambat')
+                                            <span class="badge badge-warning">Terlambat</span>
+                                        @elseif($h->status == 'izin')
+                                            <span class="badge badge-primary">Izin</span>
+                                        @elseif($h->status == 'sakit')
+                                            <span class="badge badge-info">Sakit</span>
+                                        @else
+                                            <span class="badge badge-danger">Alpha</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ Carbon\Carbon::parse($h->attended_at)->format('H:i') }}</td>
+                                    <td>
+                                        @if($h->status == 'terlambat')
+                                            Terlambat {{ $h->late_minutes }} menit
+                                        @else
+                                            Tepat Waktu
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
+@push('scripts')
 <script>
+    // DataTable Initialization
+    $('#kt_attendance_history_table').DataTable({
+        "info": false,
+        'order': [],
+        'pageLength': 10,
+    });
+
     // Realtime Clock
     setInterval(() => {
         const now = new Date();
@@ -187,4 +268,5 @@
         });
     });
 </script>
+@endpush
 @endsection

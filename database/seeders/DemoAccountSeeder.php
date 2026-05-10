@@ -13,44 +13,58 @@ use App\Models\AcademicYear;
 use App\Models\TeachingAssignment;
 use App\Models\Schedule;
 use App\Models\ClassStudent;
+use App\Models\LearningModule;
+use App\Models\Assignment;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DemoAccountSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Buat Permission Dasar
-        $permissions = [
-            'module.view', 'module.create', 'module.edit', 'module.delete',
-            'attendance.view', 'attendance.create',
-            'assignment.view', 'assignment.create', 'assignment.submit'
-        ];
-
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
-        }
-
-        // 2. Buat Role (Pastikan Case-Sensitive sesuai DB)
+        // 1. Buat Role (Jika belum ada)
+        $roleAdmin = Role::firstOrCreate(['name' => 'Admin']);
         $roleGuru = Role::firstOrCreate(['name' => 'Guru']);
         $roleSiswa = Role::firstOrCreate(['name' => 'Siswa']);
 
-        $roleGuru->syncPermissions([
-            'module.view', 'module.create', 'module.edit', 'module.delete',
-            'attendance.view', 'attendance.create',
-            'assignment.view', 'assignment.create'
-        ]);
+        // 2. Buat Data Master Sekolah & Tahun Ajaran
+        $school = School::updateOrCreate(
+            ['name' => 'LMS Academy International'],
+            [
+                'address' => 'Jl. Digital No. 101, Jakarta',
+                'email' => 'contact@lms-academy.com',
+                'phone' => '021-99887766'
+            ]
+        );
 
-        $roleSiswa->syncPermissions([
-            'module.view', 'attendance.view', 'assignment.view', 'assignment.submit'
-        ]);
+        $academicYear = AcademicYear::updateOrCreate(
+            ['name' => '2023/2024'],
+            [
+                'semester' => 'Ganjil',
+                'is_active' => 1
+            ]
+        );
 
-        // 3. Ambil Data Master Pendukung
-        $school = School::first();
-        $subject = Subject::first();
-        $class = ClassRoom::first();
-        $academicYear = AcademicYear::where('is_active', 1)->first();
+        // 3. Buat Data Master Pendukung (Ruang & Mapel)
+        $classes = [];
+        $index = 0;
+        foreach(['X-IPA 1', 'X-IPA 2', 'XI-IPS 1'] as $cName) {
+            $classes[] = ClassRoom::updateOrCreate(
+                ['name' => $cName],
+                [
+                    'school_id' => $school->id,
+                    'level' => ($index < 2) ? '10' : '11'
+                ]
+            );
+            $index++;
+        }
+
+        $subjects = [];
+        foreach(['Matematika', 'Bahasa Inggris', 'Informatika'] as $sName) {
+            $subjects[] = Subject::updateOrCreate(['name' => $sName], ['code' => Str::upper(Str::random(5))]);
+        }
 
         // 4. Buat Akun Guru Demo
         $userGuru = User::updateOrCreate(
@@ -74,23 +88,61 @@ class DemoAccountSeeder extends Seeder
             ]
         );
 
-        // --- PLOTING GURU (Agar Dropdown Isi) ---
-        if ($teacher && $subject && $class && $academicYear) {
-            TeachingAssignment::updateOrCreate(
+        // 5. Penugasan Guru & Jadwal
+        foreach ($subjects as $index => $sub) {
+            $class = $classes[$index % count($classes)];
+            
+            $ta = TeachingAssignment::updateOrCreate(
                 [
                     'teacher_id' => $teacher->id,
-                    'subject_id' => $subject->id,
+                    'subject_id' => $sub->id,
                     'class_room_id' => $class->id,
                     'academic_year_id' => $academicYear->id
                 ]
             );
+
+            // Buat Jadwal untuk setiap Penugasan
+            Schedule::updateOrCreate(
+                [
+                    'teaching_assignment_id' => $ta->id,
+                    'day_of_week' => $index + 1, // Senin, Selasa, dst
+                ],
+                [
+                    'start_time' => '08:00:00',
+                    'end_time' => '10:00:00',
+                    'is_active' => true
+                ]
+            );
+
+            // Buat Modul Demo
+            LearningModule::updateOrCreate(
+                ['title' => 'Modul Pengantar ' . $sub->name],
+                [
+                    'teaching_assignment_id' => $ta->id,
+                    'description' => 'Materi dasar untuk memahami ' . $sub->name,
+                    'file_path' => 'demo/module.pdf',
+                    'file_name' => 'module.pdf',
+                    'file_size' => 1024 * 1024 * 2, // 2MB demo
+                    'file_type' => 'pdf'
+                ]
+            );
+
+            // Buat Penugasan Demo
+            Assignment::updateOrCreate(
+                ['title' => 'Tugas Mandiri ' . $sub->name],
+                [
+                    'teaching_assignment_id' => $ta->id,
+                    'description' => 'Kerjakan latihan soal halaman 10-15',
+                    'due_date' => now()->addDays(7)
+                ]
+            );
         }
 
-        // 5. Buat Akun Siswa Demo
+        // 6. Buat Akun Siswa Demo
         $userSiswa = User::updateOrCreate(
             ['email' => 'siswa@lms.com'],
             [
-                'name' => 'Rendy Irawan (Student)',
+                'name' => 'Rendy Irawan',
                 'username' => 'rendy_student',
                 'password' => Hash::make('password123'),
                 'email_verified_at' => now(),
@@ -101,43 +153,26 @@ class DemoAccountSeeder extends Seeder
         $student = Student::updateOrCreate(
             ['user_id' => $userSiswa->id],
             [
-                'school_id' => $school ? $school->id : null,
+                'school_id' => $school->id,
                 'nisn' => '0012345678',
                 'phone' => '089876543210',
                 'gender' => 'L',
-                'address' => 'Jl. Pelajar No. 45, Medan'
+                'address' => 'Jl. Pelajar No. 45, Medan',
+                'parent_name' => 'Bpk. Heru Irawan',
+                'parent_email' => 'heru_parent@gmail.com',
+                'parent_phone' => '081234567891'
             ]
         );
 
-        // --- PLOTING SISWA KE KELAS ---
-        if ($student && $class && $academicYear) {
-            ClassStudent::updateOrCreate(
-                [
-                    'student_id' => $student->id,
-                    'class_room_id' => $class->id,
-                    'academic_year_id' => $academicYear->id
-                ]
-            );
-        }
+        // Ploting Siswa ke Kelas Pertama
+        ClassStudent::updateOrCreate(
+            [
+                'student_id' => $student->id,
+                'class_room_id' => $classes[0]->id,
+                'academic_year_id' => $academicYear->id
+            ]
+        );
 
-        // --- BUAT JADWAL DEMO ---
-        $assignment = TeachingAssignment::where('teacher_id', $teacher->id)->first();
-        if ($assignment) {
-            for ($i = 1; $i <= 5; $i++) {
-                Schedule::updateOrCreate(
-                    [
-                        'teaching_assignment_id' => $assignment->id,
-                        'day_of_week' => $i,
-                    ],
-                    [
-                        'start_time' => '08:00:00',
-                        'end_time' => '10:00:00',
-                        'is_active' => true
-                    ]
-                );
-            }
-        }
-
-        $this->command->info('Demo accounts & Plotting created successfully!');
+        $this->command->info('Semua Data Demo Berhasil Dibuat!');
     }
 }

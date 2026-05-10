@@ -15,7 +15,10 @@
 									</button>
 									<!--end::Aside toggle-->
 									<!--begin::Header Logo-->
-									<a href="{{ route('dashboard') }}">
+									@php
+										$dashboardRoute = auth()->user()->hasRole('Siswa') ? 'student.dashboard' : 'dashboard';
+									@endphp
+									<a href="{{ route($dashboardRoute) }}">
 										<img alt="Logo" src="{{ asset('assets/media/logos/lms_alt.jpeg') }}" class="h-30px h-lg-40px" />
 									</a>
 									<!--end::Header Logo-->
@@ -69,628 +72,103 @@
 											<!--begin::Wrapper-->
 											<div data-kt-search-element="wrapper">
 												<!--begin::Recently viewed-->
-												<div data-kt-search-element="results" class="d-none">
-													<!--begin::Items-->
-													<div class="scroll-y mh-200px mh-lg-350px">
-														<!--begin::Category title-->
-														<h3 class="fs-5 text-muted m-0 pb-5" data-kt-search-element="category-title">Users</h3>
-														<!--end::Category title-->
-														<!--begin::Item-->
-														<a href="#" class="d-flex text-gray-900 text-hover-primary align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<img src="{{ asset('assets/media/avatars/300-6.jpg') }}" alt="" />
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column justify-content-start fw-semibold">
-																<span class="fs-6 fw-semibold">Karina Clark</span>
-																<span class="fs-7 fw-semibold text-muted">Marketing Manager</span>
-															</div>
-															<!--end::Title-->
-														</a>
-														<!--end::Item-->
-														<!--begin::Item-->
-														<a href="#" class="d-flex text-gray-900 text-hover-primary align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<img src="{{ asset('assets/media/avatars/300-2.jpg') }}" alt="" />
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column justify-content-start fw-semibold">
-																<span class="fs-6 fw-semibold">Olivia Bold</span>
-																<span class="fs-7 fw-semibold text-muted">Software Engineer</span>
-															</div>
-															<!--end::Title-->
-														</a>
-														<!--end::Item-->
-														<!--begin::Item-->
-														<a href="#" class="d-flex text-gray-900 text-hover-primary align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<img src="{{ asset('assets/media/avatars/300-9.jpg') }}" alt="" />
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column justify-content-start fw-semibold">
-																<span class="fs-6 fw-semibold">Ana Clark</span>
-																<span class="fs-7 fw-semibold text-muted">UI/UX Designer</span>
-															</div>
-															<!--end::Title-->
-														</a>
-														<!--end::Item-->
-														<!--begin::Item-->
-														<a href="#" class="d-flex text-gray-900 text-hover-primary align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<img src="{{ asset('assets/media/avatars/300-14.jpg') }}" alt="" />
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column justify-content-start fw-semibold">
-																<span class="fs-6 fw-semibold">Nick Pitola</span>
-																<span class="fs-7 fw-semibold text-muted">Art Director</span>
-															</div>
-															<!--end::Title-->
-														</a>
-														<!--end::Item-->
-														<!--begin::Item-->
-														<a href="#" class="d-flex text-gray-900 text-hover-primary align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<img src="{{ asset('assets/media/avatars/300-11.jpg') }}" alt="" />
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column justify-content-start fw-semibold">
-																<span class="fs-6 fw-semibold">Edward Kulnic</span>
-																<span class="fs-7 fw-semibold text-muted">System Administrator</span>
-															</div>
-															<!--end::Title-->
-														</a>
-														<!--end::Item-->
-														<!--begin::Category title-->
-														<h3 class="fs-5 text-muted m-0 pt-5 pb-5" data-kt-search-element="category-title">Customers</h3>
-														<!--end::Category title-->
-														<!--begin::Item-->
-														<a href="#" class="d-flex text-gray-900 text-hover-primary align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<span class="symbol-label bg-light">
-																	<img class="w-20px h-20px" src="{{ asset('assets/media/svg/brand-logos/volicity-9.svg') }}" alt="" />
-																</span>
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column justify-content-start fw-semibold">
-																<span class="fs-6 fw-semibold">Company Rbranding</span>
-																<span class="fs-7 fw-semibold text-muted">UI Design</span>
-															</div>
-															<!--end::Title-->
-														</a>
-														<!--end::Item-->
-														<!--begin::Item-->
-														<a href="#" class="d-flex text-gray-900 text-hover-primary align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<span class="symbol-label bg-light">
-																	<img class="w-20px h-20px" src="{{ asset('assets/media/svg/brand-logos/tvit.svg') }}" alt="" />
-																</span>
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column justify-content-start fw-semibold">
-																<span class="fs-6 fw-semibold">Company Re-branding</span>
-																<span class="fs-7 fw-semibold text-muted">Web Development</span>
-															</div>
-															<!--end::Title-->
-														</a>
-														<!--end::Item-->
-														<!--begin::Item-->
-														<a href="#" class="d-flex text-gray-900 text-hover-primary align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<span class="symbol-label bg-light">
-																	<img class="w-20px h-20px" src="{{ asset('assets/media/svg/misc/infography.svg') }}" alt="" />
-																</span>
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column justify-content-start fw-semibold">
-																<span class="fs-6 fw-semibold">Business Analytics App</span>
-																<span class="fs-7 fw-semibold text-muted">Administration</span>
-															</div>
-															<!--end::Title-->
-														</a>
-														<!--end::Item-->
-														<!--begin::Item-->
-														<a href="#" class="d-flex text-gray-900 text-hover-primary align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<span class="symbol-label bg-light">
-																	<img class="w-20px h-20px" src="{{ asset('assets/media/svg/brand-logos/leaf.svg') }}" alt="" />
-																</span>
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column justify-content-start fw-semibold">
-																<span class="fs-6 fw-semibold">EcoLeaf App Launch</span>
-																<span class="fs-7 fw-semibold text-muted">Marketing</span>
-															</div>
-															<!--end::Title-->
-														</a>
-														<!--end::Item-->
-														<!--begin::Item-->
-														<a href="#" class="d-flex text-gray-900 text-hover-primary align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<span class="symbol-label bg-light">
-																	<img class="w-20px h-20px" src="{{ asset('assets/media/svg/brand-logos/tower.svg') }}" alt="" />
-																</span>
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column justify-content-start fw-semibold">
-																<span class="fs-6 fw-semibold">Tower Group Website</span>
-																<span class="fs-7 fw-semibold text-muted">Google Adwords</span>
-															</div>
-															<!--end::Title-->
-														</a>
-														<!--end::Item-->
-														<!--begin::Category title-->
-														<h3 class="fs-5 text-muted m-0 pt-5 pb-5" data-kt-search-element="category-title">Projects</h3>
-														<!--end::Category title-->
-														<!--begin::Item-->
-														<a href="#" class="d-flex text-gray-900 text-hover-primary align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<span class="symbol-label bg-light">
-																	<i class="ki-duotone ki-notepad fs-2 text-primary">
-																		<span class="path1"></span>
-																		<span class="path2"></span>
-																		<span class="path3"></span>
-																		<span class="path4"></span>
-																		<span class="path5"></span>
-																	</i>
-																</span>
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column">
-																<span class="fs-6 fw-semibold">Si-Fi Project by AU Themes</span>
-																<span class="fs-7 fw-semibold text-muted">#45670</span>
-															</div>
-															<!--end::Title-->
-														</a>
-														<!--end::Item-->
-														<!--begin::Item-->
-														<a href="#" class="d-flex text-gray-900 text-hover-primary align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<span class="symbol-label bg-light">
-																	<i class="ki-duotone ki-frame fs-2 text-primary">
-																		<span class="path1"></span>
-																		<span class="path2"></span>
-																		<span class="path3"></span>
-																		<span class="path4"></span>
-																	</i>
-																</span>
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column">
-																<span class="fs-6 fw-semibold">Shopix Mobile App Planning</span>
-																<span class="fs-7 fw-semibold text-muted">#45690</span>
-															</div>
-															<!--end::Title-->
-														</a>
-														<!--end::Item-->
-														<!--begin::Item-->
-														<a href="#" class="d-flex text-gray-900 text-hover-primary align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<span class="symbol-label bg-light">
-																	<i class="ki-duotone ki-message-text-2 fs-2 text-primary">
-																		<span class="path1"></span>
-																		<span class="path2"></span>
-																		<span class="path3"></span>
-																	</i>
-																</span>
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column">
-																<span class="fs-6 fw-semibold">Finance Monitoring SAAS Discussion</span>
-																<span class="fs-7 fw-semibold text-muted">#21090</span>
-															</div>
-															<!--end::Title-->
-														</a>
-														<!--end::Item-->
-														<!--begin::Item-->
-														<a href="#" class="d-flex text-gray-900 text-hover-primary align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<span class="symbol-label bg-light">
-																	<i class="ki-duotone ki-profile-circle fs-2 text-primary">
-																		<span class="path1"></span>
-																		<span class="path2"></span>
-																		<span class="path3"></span>
-																	</i>
-																</span>
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column">
-																<span class="fs-6 fw-semibold">Dashboard Analitics Launch</span>
-																<span class="fs-7 fw-semibold text-muted">#34560</span>
-															</div>
-															<!--end::Title-->
-														</a>
-														<!--end::Item-->
+												<div id="custom-search-results" class="scroll-y mh-200px mh-lg-350px">
+													<div class="text-muted fs-7 text-center py-10" id="search-initial-msg">
+														Ketik untuk mencari menu...
 													</div>
-													<!--end::Items-->
-												</div>
-												<!--end::Recently viewed-->
-												<!--begin::Recently viewed-->
-												<div class="" data-kt-search-element="main">
-													<!--begin::Heading-->
-													<div class="d-flex flex-stack fw-semibold mb-4">
-														<!--begin::Label-->
-														<span class="text-muted fs-6 me-2">Recently Searched:</span>
-														<!--end::Label-->
-														<!--begin::Toolbar-->
-														<div class="d-flex" data-kt-search-element="toolbar">
-															<!--begin::Preferences toggle-->
-															<div data-kt-search-element="preferences-show" class="btn btn-icon w-20px btn-sm btn-active-color-primary me-2 data-bs-toggle=" title="Show search preferences">
-																<i class="ki-duotone ki-setting-2 fs-2">
-																	<span class="path1"></span>
-																	<span class="path2"></span>
-																</i>
-															</div>
-															<!--end::Preferences toggle-->
-															<!--begin::Advanced search toggle-->
-															<div data-kt-search-element="advanced-options-form-show" class="btn btn-icon w-20px btn-sm btn-active-color-primary me-n1" data-bs-toggle="tooltip" title="Show more search options">
-																<i class="ki-duotone ki-down fs-2"></i>
-															</div>
-															<!--end::Advanced search toggle-->
-														</div>
-														<!--end::Toolbar-->
-													</div>
-													<!--end::Heading-->
-													<!--begin::Items-->
-													<div class="scroll-y mh-200px mh-lg-325px">
-														<!--begin::Item-->
-														<div class="d-flex align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<span class="symbol-label bg-light">
-																	<i class="ki-duotone ki-laptop fs-2 text-primary">
-																		<span class="path1"></span>
-																		<span class="path2"></span>
-																	</i>
-																</span>
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column">
-																<a href="#" class="fs-6 text-gray-800 text-hover-primary fw-semibold">BoomApp by Keenthemes</a>
-																<span class="fs-7 text-muted fw-semibold">#45789</span>
-															</div>
-															<!--end::Title-->
-														</div>
-														<!--end::Item-->
-														<!--begin::Item-->
-														<div class="d-flex align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<span class="symbol-label bg-light">
-																	<i class="ki-duotone ki-chart-simple fs-2 text-primary">
-																		<span class="path1"></span>
-																		<span class="path2"></span>
-																		<span class="path3"></span>
-																		<span class="path4"></span>
-																	</i>
-																</span>
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column">
-																<a href="#" class="fs-6 text-gray-800 text-hover-primary fw-semibold">"Kept API Project Meeting</a>
-																<span class="fs-7 text-muted fw-semibold">#84050</span>
-															</div>
-															<!--end::Title-->
-														</div>
-														<!--end::Item-->
-														<!--begin::Item-->
-														<div class="d-flex align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<span class="symbol-label bg-light">
-																	<i class="ki-duotone ki-chart fs-2 text-primary">
-																		<span class="path1"></span>
-																		<span class="path2"></span>
-																	</i>
-																</span>
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column">
-																<a href="#" class="fs-6 text-gray-800 text-hover-primary fw-semibold">"KPI Monitoring App Launch</a>
-																<span class="fs-7 text-muted fw-semibold">#84250</span>
-															</div>
-															<!--end::Title-->
-														</div>
-														<!--end::Item-->
-														<!--begin::Item-->
-														<div class="d-flex align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<span class="symbol-label bg-light">
-																	<i class="ki-duotone ki-chart-line-down fs-2 text-primary">
-																		<span class="path1"></span>
-																		<span class="path2"></span>
-																	</i>
-																</span>
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column">
-																<a href="#" class="fs-6 text-gray-800 text-hover-primary fw-semibold">Project Reference FAQ</a>
-																<span class="fs-7 text-muted fw-semibold">#67945</span>
-															</div>
-															<!--end::Title-->
-														</div>
-														<!--end::Item-->
-														<!--begin::Item-->
-														<div class="d-flex align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<span class="symbol-label bg-light">
-																	<i class="ki-duotone ki-sms fs-2 text-primary">
-																		<span class="path1"></span>
-																		<span class="path2"></span>
-																	</i>
-																</span>
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column">
-																<a href="#" class="fs-6 text-gray-800 text-hover-primary fw-semibold">"FitPro App Development</a>
-																<span class="fs-7 text-muted fw-semibold">#84250</span>
-															</div>
-															<!--end::Title-->
-														</div>
-														<!--end::Item-->
-														<!--begin::Item-->
-														<div class="d-flex align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<span class="symbol-label bg-light">
-																	<i class="ki-duotone ki-bank fs-2 text-primary">
-																		<span class="path1"></span>
-																		<span class="path2"></span>
-																	</i>
-																</span>
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column">
-																<a href="#" class="fs-6 text-gray-800 text-hover-primary fw-semibold">Shopix Mobile App</a>
-																<span class="fs-7 text-muted fw-semibold">#45690</span>
-															</div>
-															<!--end::Title-->
-														</div>
-														<!--end::Item-->
-														<!--begin::Item-->
-														<div class="d-flex align-items-center mb-5">
-															<!--begin::Symbol-->
-															<div class="symbol symbol-40px me-4">
-																<span class="symbol-label bg-light">
-																	<i class="ki-duotone ki-chart-line-down fs-2 text-primary">
-																		<span class="path1"></span>
-																		<span class="path2"></span>
-																	</i>
-																</span>
-															</div>
-															<!--end::Symbol-->
-															<!--begin::Title-->
-															<div class="d-flex flex-column">
-																<a href="#" class="fs-6 text-gray-800 text-hover-primary fw-semibold">"Landing UI Design" Launch</a>
-																<span class="fs-7 text-muted fw-semibold">#24005</span>
-															</div>
-															<!--end::Title-->
-														</div>
-														<!--end::Item-->
-													</div>
-													<!--end::Items-->
 												</div>
 												<!--end::Recently viewed-->
 												<!--begin::Empty-->
-												<div data-kt-search-element="empty" class="text-center d-none">
+												<div data-kt-search-element="empty" class="text-center d-none" id="custom-search-empty">
 													<!--begin::Icon-->
 													<div class="pt-10 pb-10">
 														<i class="ki-duotone ki-search-list fs-4x opacity-50">
-															<span class="path1"></span>
-															<span class="path2"></span>
-															<span class="path3"></span>
+															<span class="path1"></span><span class="path2"></span><span class="path3"></span>
 														</i>
 													</div>
 													<!--end::Icon-->
 													<!--begin::Message-->
 													<div class="pb-15 fw-semibold">
-														<h3 class="text-gray-600 fs-5 mb-2">No result found</h3>
-														<div class="text-muted fs-7">Please try again with a different query</div>
+														<h3 class="text-gray-600 fs-5 mb-2">Tidak ditemukan</h3>
+														<div class="text-muted fs-7">Coba kata kunci lain</div>
 													</div>
 													<!--end::Message-->
 												</div>
 												<!--end::Empty-->
 											</div>
 											<!--end::Wrapper-->
-											<!--begin::Preferences-->
-											<form data-kt-search-element="advanced-options-form" class="pt-1 d-none">
-												<!--begin::Heading-->
-												<h3 class="fw-semibold text-gray-900 mb-7">Advanced Search</h3>
-												<!--end::Heading-->
-												<!--begin::Input group-->
-												<div class="mb-5">
-													<input type="text" class="form-control form-control-sm form-control-solid" placeholder="Contains the word" name="query" />
-												</div>
-												<!--end::Input group-->
-												<!--begin::Input group-->
-												<div class="mb-5">
-													<!--begin::Radio group-->
-													<div class="nav-group nav-group-fluid">
-														<!--begin::Option-->
-														<label>
-															<input type="radio" class="btn-check" name="type" value="has" checked="checked" />
-															<span class="btn btn-sm btn-color-muted btn-active btn-active-primary">All</span>
-														</label>
-														<!--end::Option-->
-														<!--begin::Option-->
-														<label>
-															<input type="radio" class="btn-check" name="type" value="users" />
-															<span class="btn btn-sm btn-color-muted btn-active btn-active-primary px-4">Users</span>
-														</label>
-														<!--end::Option-->
-														<!--begin::Option-->
-														<label>
-															<input type="radio" class="btn-check" name="type" value="orders" />
-															<span class="btn btn-sm btn-color-muted btn-active btn-active-primary px-4">Orders</span>
-														</label>
-														<!--end::Option-->
-														<!--begin::Option-->
-														<label>
-															<input type="radio" class="btn-check" name="type" value="projects" />
-															<span class="btn btn-sm btn-color-muted btn-active btn-active-primary px-4">Projects</span>
-														</label>
-														<!--end::Option-->
-													</div>
-													<!--end::Radio group-->
-												</div>
-												<!--end::Input group-->
-												<!--begin::Input group-->
-												<div class="mb-5">
-													<input type="text" name="assignedto" class="form-control form-control-sm form-control-solid" placeholder="Assigned to" value="" />
-												</div>
-												<!--end::Input group-->
-												<!--begin::Input group-->
-												<div class="mb-5">
-													<input type="text" name="collaborators" class="form-control form-control-sm form-control-solid" placeholder="Collaborators" value="" />
-												</div>
-												<!--end::Input group-->
-												<!--begin::Input group-->
-												<div class="mb-5">
-													<!--begin::Radio group-->
-													<div class="nav-group nav-group-fluid">
-														<!--begin::Option-->
-														<label>
-															<input type="radio" class="btn-check" name="attachment" value="has" checked="checked" />
-															<span class="btn btn-sm btn-color-muted btn-active btn-active-primary">Has attachment</span>
-														</label>
-														<!--end::Option-->
-														<!--begin::Option-->
-														<label>
-															<input type="radio" class="btn-check" name="attachment" value="any" />
-															<span class="btn btn-sm btn-color-muted btn-active btn-active-primary px-4">Any</span>
-														</label>
-														<!--end::Option-->
-													</div>
-													<!--end::Radio group-->
-												</div>
-												<!--end::Input group-->
-												<!--begin::Input group-->
-												<div class="mb-5">
-													<select name="timezone" aria-label="Select a Timezone" data-control="select2" data-dropdown-parent="#kt_header_search" data-placeholder="date_period" class="form-select form-select-sm form-select-solid">
-														<option value="next">Within the next</option>
-														<option value="last">Within the last</option>
-														<option value="between">Between</option>
-														<option value="on">On</option>
-													</select>
-												</div>
-												<!--end::Input group-->
-												<!--begin::Input group-->
-												<div class="row mb-8">
-													<!--begin::Col-->
-													<div class="col-6">
-														<input type="number" name="date_number" class="form-control form-control-sm form-control-solid" placeholder="Lenght" value="" />
-													</div>
-													<!--end::Col-->
-													<!--begin::Col-->
-													<div class="col-6">
-														<select name="date_typer" aria-label="Select a Timezone" data-control="select2" data-dropdown-parent="#kt_header_search" data-placeholder="Period" class="form-select form-select-sm form-select-solid">
-															<option value="days">Days</option>
-															<option value="weeks">Weeks</option>
-															<option value="months">Months</option>
-															<option value="years">Years</option>
-														</select>
-													</div>
-													<!--end::Col-->
-												</div>
-												<!--end::Input group-->
-												<!--begin::Actions-->
-												<div class="d-flex justify-content-end">
-													<button type="reset" class="btn btn-sm btn-light fw-bold btn-active-light-primary me-2" data-kt-search-element="advanced-options-form-cancel">Cancel</button>
-													<a href="utilities/search/horizontal.html" class="btn btn-sm fw-bold btn-primary" data-kt-search-element="advanced-options-form-search">Search</a>
-												</div>
-												<!--end::Actions-->
-											</form>
-											<!--end::Preferences-->
-											<!--begin::Preferences-->
-											<form data-kt-search-element="preferences" class="pt-1 d-none">
-												<!--begin::Heading-->
-												<h3 class="fw-semibold text-gray-900 mb-7">Search Preferences</h3>
-												<!--end::Heading-->
-												<!--begin::Input group-->
-												<div class="pb-4 border-bottom">
-													<label class="form-check form-switch form-switch-sm form-check-custom form-check-solid flex-stack">
-														<span class="form-check-label text-gray-700 fs-6 fw-semibold ms-0 me-2">Projects</span>
-														<input class="form-check-input" type="checkbox" value="1" checked="checked" />
-													</label>
-												</div>
-												<!--end::Input group-->
-												<!--begin::Input group-->
-												<div class="py-4 border-bottom">
-													<label class="form-check form-switch form-switch-sm form-check-custom form-check-solid flex-stack">
-														<span class="form-check-label text-gray-700 fs-6 fw-semibold ms-0 me-2">Targets</span>
-														<input class="form-check-input" type="checkbox" value="1" checked="checked" />
-													</label>
-												</div>
-												<!--end::Input group-->
-												<!--begin::Input group-->
-												<div class="py-4 border-bottom">
-													<label class="form-check form-switch form-switch-sm form-check-custom form-check-solid flex-stack">
-														<span class="form-check-label text-gray-700 fs-6 fw-semibold ms-0 me-2">Affiliate Programs</span>
-														<input class="form-check-input" type="checkbox" value="1" />
-													</label>
-												</div>
-												<!--end::Input group-->
-												<!--begin::Input group-->
-												<div class="py-4 border-bottom">
-													<label class="form-check form-switch form-switch-sm form-check-custom form-check-solid flex-stack">
-														<span class="form-check-label text-gray-700 fs-6 fw-semibold ms-0 me-2">Referrals</span>
-														<input class="form-check-input" type="checkbox" value="1" checked="checked" />
-													</label>
-												</div>
-												<!--end::Input group-->
-												<!--begin::Input group-->
-												<div class="py-4 border-bottom">
-													<label class="form-check form-switch form-switch-sm form-check-custom form-check-solid flex-stack">
-														<span class="form-check-label text-gray-700 fs-6 fw-semibold ms-0 me-2">Users</span>
-														<input class="form-check-input" type="checkbox" value="1" />
-													</label>
-												</div>
-												<!--end::Input group-->
-												<!--begin::Actions-->
-												<div class="d-flex justify-content-end pt-7">
-													<button type="reset" class="btn btn-sm btn-light fw-bold btn-active-light-primary me-2" data-kt-search-element="preferences-dismiss">Cancel</button>
-													<button type="submit" class="btn btn-sm fw-bold btn-primary">Save Changes</button>
-												</div>
-												<!--end::Actions-->
-											</form>
-											<!--end::Preferences-->
 										</div>
 										<!--end::Menu-->
+
+@push('scripts')
+<script>
+	const searchInput = document.querySelector('input[name="search"]');
+	const resultsContainer = document.getElementById('custom-search-results');
+	const emptyContainer = document.getElementById('custom-search-empty');
+	const initialMsg = document.getElementById('search-initial-msg');
+
+	// Definisi menu-menu aplikasi
+	const appMenus = [
+		// Admin
+		{ title: 'Dashboard Admin', url: '{{ route("dashboard") }}', icon: 'ki-element-11', type: 'admin' },
+		{ title: 'Data Sekolah', url: '{{ route("schools.index") }}', icon: 'ki-bank', type: 'admin' },
+		{ title: 'Tahun Ajaran', url: '{{ route("academic-years.index") }}', icon: 'ki-calendar', type: 'admin' },
+		{ title: 'Ruang Kelas', url: '{{ route("class-rooms.index") }}', icon: 'ki-shop', type: 'admin' },
+		{ title: 'Data Siswa', url: '{{ route("students.index") }}', icon: 'ki-profile-user', type: 'admin' },
+		{ title: 'Data Guru', url: '{{ route("teachers.index") }}', icon: 'ki-badge', type: 'admin' },
+		{ title: 'Mata Pelajaran', url: '{{ route("subjects.index") }}', icon: 'ki-book-square', type: 'admin' },
+		{ title: 'Jadwal Pelajaran', url: '{{ route("schedules.index") }}', icon: 'ki-calendar-8', type: 'admin' },
+		{ title: 'Modul Pembelajaran', url: '{{ route("learning-modules.index") }}', icon: 'ki-book', type: 'admin' },
+		{ title: 'Pengaturan Absensi', url: '{{ route("attendance-settings.index") }}', icon: 'ki-setting-2', type: 'admin' },
+		{ title: 'Penugasan Guru', url: '{{ route("teaching-assignments.index") }}', icon: 'ki-teacher', type: 'admin' },
+		{ title: 'Penugasan Siswa', url: '{{ route("assignments.index") }}', icon: 'ki-notepad-edit', type: 'admin' },
+		{ title: 'Rombongan Belajar', url: '{{ route("enrollments.index") }}', icon: 'ki-people', type: 'admin' },
+		
+		// Siswa (Portal)
+		{ title: 'Portal Siswa', url: '{{ route("student.dashboard") }}', icon: 'ki-home', type: 'student' },
+		{ title: 'Absensi Saya', url: '{{ route("student.attendance") }}', icon: 'ki-fingerprint-scan', type: 'student' },
+	];
+
+	const isStudent = {{ auth()->user()->hasRole('Siswa') ? 'true' : 'false' }};
+	const availableMenus = appMenus.filter(m => isStudent ? m.type === 'student' : m.type === 'admin');
+
+	searchInput.addEventListener('input', function(e) {
+		const keyword = e.target.value.toLowerCase();
+		resultsContainer.innerHTML = '';
+		
+		if (keyword.length < 2) {
+			resultsContainer.innerHTML = '<div class="text-muted fs-7 text-center py-10">Ketik untuk mencari menu...</div>';
+			emptyContainer.classList.add('d-none');
+			return;
+		}
+
+		const filtered = availableMenus.filter(m => m.title.toLowerCase().includes(keyword));
+
+		if (filtered.length > 0) {
+			emptyContainer.classList.add('d-none');
+			filtered.forEach(menu => {
+				const item = `
+				<a href="${menu.url}" class="d-flex text-gray-900 text-hover-primary align-items-center mb-5">
+					<div class="symbol symbol-40px me-4">
+						<span class="symbol-label bg-light">
+							<i class="ki-duotone ${menu.icon} fs-2 text-primary">
+								<span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span>
+							</i>
+						</span>
+					</div>
+					<div class="d-flex flex-column justify-content-start fw-semibold">
+						<span class="fs-6 fw-semibold">${menu.title}</span>
+						<span class="fs-7 fw-semibold text-muted">Menu Aplikasi</span>
+					</div>
+				</a>`;
+				resultsContainer.innerHTML += item;
+			});
+		} else {
+			emptyContainer.classList.remove('d-none');
+		}
+	});
+</script>
+@endpush
 									</div>
 									<!--end::Search-->
 								</div>
@@ -699,13 +177,10 @@
 							<!--end::Brand-->
 							<!--begin::Toolbar wrapper-->
 							<div class="d-flex align-items-stretch flex-shrink-0">
-								<!--begin::Button-->
-								<a href="#" class="btn btn-light-success me-1" data-bs-toggle="modal" data-bs-target="#kt_modal_create_project">Create</a>
-								<!--end::Button-->
 								<!--begin::Activities-->
 								<div class="d-flex align-items-center ms-1 ms-lg-3">
-									<!--begin::drawer toggle-->
-									<div class="position-relative btn btn-color-gray-800 btn-icon btn-active-light-primary w-30px h-30px w-md-40px h-md-40px" id="kt_drawer_chat_toggle">
+									<!--begin::Drawer toggle-->
+									<div class="position-relative btn btn-color-gray-800 btn-icon btn-active-light-primary w-30px h-30px w-md-40px h-md-40px" id="kt_notification_toggle" data-bs-toggle="offcanvas" data-bs-target="#kt_notification_drawer" aria-controls="kt_notification_drawer">
 										<i class="ki-duotone ki-notification-status fs-1">
 											<span class="path1"></span>
 											<span class="path2"></span>
@@ -714,7 +189,7 @@
 										</i>
 										<span class="bullet bullet-dot bg-danger h-6px w-6px position-absolute translate-middle top-0 start-50 animation-blink"></span>
 									</div>
-									<!--end::drawer toggle-->
+									<!--end::Drawer toggle-->
 								</div>
 								<!--end::Activities-->
 								<!--begin::Theme mode-->
@@ -828,140 +303,18 @@
 										<!--end::Menu separator-->
 										<!--begin::Menu item-->
 										<div class="menu-item px-5">
-											<a href="{{ route('account.index') }}" class="menu-link px-5">My Profile</a>
-										</div>
-										<!--end::Menu item-->
-										<!--begin::Menu item-->
-										<div class="menu-item px-5">
-											<a href="apps/projects/list.html" class="menu-link px-5">
-												<span class="menu-text">My Projects</span>
-												<span class="menu-badge">
-													<span class="badge badge-light-danger badge-circle fw-bold fs-7">3</span>
-												</span>
-											</a>
-										</div>
-										<!--end::Menu item-->
-										<!--begin::Menu item-->
-										<div class="menu-item px-5" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="right-start" data-kt-menu-offset="-15px, 0">
-											<a href="#" class="menu-link px-5">
-												<span class="menu-title">My Subscription</span>
-												<span class="menu-arrow"></span>
-											</a>
-											<!--begin::Menu sub-->
-											<div class="menu-sub menu-sub-dropdown w-175px py-4">
-												<!--begin::Menu item-->
-												<div class="menu-item px-3">
-													<a href="account/referrals.html" class="menu-link px-5">Referrals</a>
-												</div>
-												<!--end::Menu item-->
-												<!--begin::Menu item-->
-												<div class="menu-item px-3">
-													<a href="account/billing.html" class="menu-link px-5">Billing</a>
-												</div>
-												<!--end::Menu item-->
-												<!--begin::Menu item-->
-												<div class="menu-item px-3">
-													<a href="account/statements.html" class="menu-link px-5">Payments</a>
-												</div>
-												<!--end::Menu item-->
-												<!--begin::Menu item-->
-												<div class="menu-item px-3">
-													<a href="account/statements.html" class="menu-link d-flex flex-stack px-5">Statements 
-													<span class="ms-2 lh-0" data-bs-toggle="tooltip" title="View your statements">
-														<i class="ki-duotone ki-information-5 fs-5">
-															<span class="path1"></span>
-															<span class="path2"></span>
-															<span class="path3"></span>
-														</i>
-													</span></a>
-												</div>
-												<!--end::Menu item-->
-												<!--begin::Menu separator-->
-												<div class="separator my-2"></div>
-												<!--end::Menu separator-->
-												<!--begin::Menu item-->
-												<div class="menu-item px-3">
-													<div class="menu-content px-3">
-														<label class="form-check form-switch form-check-custom form-check-solid">
-															<input class="form-check-input w-30px h-20px" type="checkbox" value="1" checked="checked" name="notifications" />
-															<span class="form-check-label text-muted fs-7">Notifications</span>
-														</label>
-													</div>
-												</div>
-												<!--end::Menu item-->
-											</div>
-											<!--end::Menu sub-->
-										</div>
-										<!--end::Menu item-->
-										<!--begin::Menu item-->
-										<div class="menu-item px-5">
-											<a href="account/statements.html" class="menu-link px-5">My Statements</a>
+											@php
+												$profileRoute = auth()->user()->hasRole('Siswa') ? 'student.account.index' : 'account.index';
+											@endphp
+											<a href="{{ route($profileRoute) }}" class="menu-link px-5">My Profile</a>
 										</div>
 										<!--end::Menu item-->
 										<!--begin::Menu separator-->
 										<div class="separator my-2"></div>
 										<!--end::Menu separator-->
 										<!--begin::Menu item-->
-										<div class="menu-item px-5" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="right-start" data-kt-menu-offset="-15px, 0">
-											<a href="#" class="menu-link px-5">
-												<span class="menu-title position-relative">Language 
-												<span class="fs-8 rounded bg-light px-3 py-2 position-absolute translate-middle-y top-50 end-0">English 
-												<img class="w-15px h-15px rounded-1 ms-2" src="{{ asset('assets/media/flags/united-states.svg') }}" alt="" /></span></span>
-											</a>
-											<!--begin::Menu sub-->
-											<div class="menu-sub menu-sub-dropdown w-175px py-4">
-												<!--begin::Menu item-->
-												<div class="menu-item px-3">
-													<a href="account/settings.html" class="menu-link d-flex px-5 active">
-													<span class="symbol symbol-20px me-4">
-														<img class="rounded-1" src="{{ asset('assets/media/flags/united-states.svg') }}" alt="" />
-													</span>English</a>
-												</div>
-												<!--end::Menu item-->
-												<!--begin::Menu item-->
-												<div class="menu-item px-3">
-													<a href="account/settings.html" class="menu-link d-flex px-5">
-													<span class="symbol symbol-20px me-4">
-														<img class="rounded-1" src="{{ asset('assets/media/flags/spain.svg') }}" alt="" />
-													</span>Spanish</a>
-												</div>
-												<!--end::Menu item-->
-												<!--begin::Menu item-->
-												<div class="menu-item px-3">
-													<a href="account/settings.html" class="menu-link d-flex px-5">
-													<span class="symbol symbol-20px me-4">
-														<img class="rounded-1" src="{{ asset('assets/media/flags/germany.svg') }}" alt="" />
-													</span>German</a>
-												</div>
-												<!--end::Menu item-->
-												<!--begin::Menu item-->
-												<div class="menu-item px-3">
-													<a href="account/settings.html" class="menu-link d-flex px-5">
-													<span class="symbol symbol-20px me-4">
-														<img class="rounded-1" src="{{ asset('assets/media/flags/japan.svg') }}" alt="" />
-													</span>Japanese</a>
-												</div>
-												<!--end::Menu item-->
-												<!--begin::Menu item-->
-												<div class="menu-item px-3">
-													<a href="account/settings.html" class="menu-link d-flex px-5">
-													<span class="symbol symbol-20px me-4">
-														<img class="rounded-1" src="{{ asset('assets/media/flags/france.svg') }}" alt="" />
-													</span>French</a>
-												</div>
-												<!--end::Menu item-->
-											</div>
-											<!--end::Menu sub-->
-										</div>
-										<!--end::Menu item-->
-										<!--begin::Menu item-->
-										<div class="menu-item px-5 my-1">
-											<a href="{{ route('settings.index') }}" class="menu-link px-5">Account Settings</a>
-										</div>
-										<!--end::Menu item-->
-										<!--begin::Menu item-->
 										<div class="menu-item px-5">
-											<a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="menu-link px-5">Sign Out</a>
+											<a href="#" onclick="confirmSignOut(event)" class="menu-link px-5">Sign Out</a>
 											<form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
 												@csrf
 											</form>
@@ -972,16 +325,112 @@
 									<!--end::Menu wrapper-->
 								</div>
 								<!--end::User menu-->
-								<!--begin::Chat-->
-								<div class="d-flex align-items-center ms-1 ms-lg-3">
-									<!--begin::Drawer wrapper-->
-									<div class="btn btn-icon btn-danger position-relative w-30px h-30px w-md-40px h-md-40px" id="kt_drawer_chat_toggle">3</div>
-									<!--end::Drawer wrapper-->
-								</div>
-								<!--end::Chat-->
 							</div>
 							<!--end::Toolbar wrapper-->
 						</div>
 						<!--end::Container-->
 					</div>
 					<!--end::Header-->
+
+<!--begin::Notification Drawer (Offcanvas Right)-->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="kt_notification_drawer" aria-labelledby="kt_notification_drawer_label" style="width: 400px;">
+	<div class="offcanvas-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+		<h5 class="offcanvas-title text-white fw-bold" id="kt_notification_drawer_label">
+			<i class="ki-duotone ki-notification-status fs-2 text-white me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+			Notifikasi Sistem
+		</h5>
+		<button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+	</div>
+	<div class="offcanvas-body p-0">
+		@php
+			$notifications = collect();
+			if(class_exists('\App\Models\LearningModule')) {
+				foreach(\App\Models\LearningModule::latest()->take(3)->get() as $module) {
+					$notifications->push([
+						'icon' => 'ki-book', 'color' => 'success',
+						'title' => 'Modul Baru: ' . $module->title,
+						'time' => $module->created_at->diffForHumans()
+					]);
+				}
+			}
+			if(class_exists('\App\Models\Assignment')) {
+				foreach(\App\Models\Assignment::latest()->take(3)->get() as $assignment) {
+					$notifications->push([
+						'icon' => 'ki-notepad-edit', 'color' => 'warning',
+						'title' => 'Penugasan: ' . $assignment->title,
+						'time' => $assignment->created_at->diffForHumans()
+					]);
+				}
+			}
+			if(class_exists('\App\Models\Attendance')) {
+				foreach(\App\Models\Attendance::with('user')->latest()->take(3)->get() as $attendance) {
+					$notifications->push([
+						'icon' => 'ki-badge', 'color' => 'primary',
+						'title' => 'Absensi: ' . ($attendance->user->name ?? 'User') . ' (' . ucfirst($attendance->type) . ')',
+						'time' => $attendance->created_at->diffForHumans()
+					]);
+				}
+			}
+			if(auth()->user() && auth()->user()->hasRole('Superadmin') && class_exists('\Spatie\Activitylog\Models\Activity')) {
+				foreach(\Spatie\Activitylog\Models\Activity::latest()->take(5)->get() as $log) {
+					$notifications->push([
+						'icon' => 'ki-user-tick', 'color' => 'info',
+						'title' => 'Aktivitas: ' . $log->description,
+						'time' => $log->created_at->diffForHumans()
+					]);
+				}
+			}
+		@endphp
+
+		<div class="px-7 py-5">
+			<div class="d-flex align-items-center justify-content-between mb-4">
+				<span class="text-gray-600 fw-bold fs-7">{{ $notifications->count() }} notifikasi terbaru</span>
+			</div>
+		</div>
+		<div class="separator"></div>
+		<div class="scroll-y px-7 py-3" style="max-height: calc(100vh - 180px);">
+			@forelse($notifications as $notif)
+			<div class="d-flex align-items-start py-4">
+				<div class="symbol symbol-40px me-4">
+					<span class="symbol-label bg-light-{{ $notif['color'] }}">
+						<i class="ki-duotone {{ $notif['icon'] }} fs-2 text-{{ $notif['color'] }}">
+							<span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span>
+						</i>
+					</span>
+				</div>
+				<div class="flex-grow-1">
+					<span class="fs-6 text-gray-800 fw-bold d-block">{{ Str::limit($notif['title'], 50) }}</span>
+					<span class="text-gray-400 fs-7">{{ $notif['time'] }}</span>
+				</div>
+			</div>
+			<div class="separator separator-dashed"></div>
+			@empty
+			<div class="text-center py-15">
+				<i class="ki-duotone ki-notification-bing fs-3x text-gray-300 mb-5"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+				<div class="text-gray-500 fw-semibold fs-6">Belum ada notifikasi baru.</div>
+			</div>
+			@endforelse
+		</div>
+	</div>
+</div>
+<!--end::Notification Drawer-->
+
+<script>
+function confirmSignOut(event) {
+	event.preventDefault();
+	Swal.fire({
+		title: 'Konfirmasi Keluar',
+		text: "Apakah Anda yakin ingin keluar dari aplikasi?",
+		icon: 'warning',
+		showCancelButton: true,
+		confirmButtonColor: '#3085d6',
+		cancelButtonColor: '#d33',
+		confirmButtonText: 'Ya, Keluar!',
+		cancelButtonText: 'Batal'
+	}).then((result) => {
+		if (result.isConfirmed) {
+			document.getElementById('logout-form').submit();
+		}
+	});
+}
+</script>

@@ -49,7 +49,7 @@
         
         <!-- Library Grid -->
         <div class="row g-6 g-xl-9">
-            @foreach($items as $item)
+            @forelse($items as $item)
             <div class="col-md-6 col-lg-4 col-xl-3">
                 <div class="card h-100 card-custom border-0 shadow-sm overflow-hidden card-hover">
                     <!-- Assignment Cover -->
@@ -109,7 +109,7 @@
 
                     <!-- Footer Actions -->
                     <div class="card-footer p-2 border-0 bg-light-dark bg-opacity-10">
-                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between align-items-center px-2">
                             <div class="d-flex gap-1">
                                 @if($item->file_path)
                                 <a href="{{ Storage::url($item->file_path) }}" class="btn btn-sm btn-icon btn-active-color-primary" target="_blank" title="Lihat Lampiran PDF">
@@ -128,7 +128,7 @@
                                 </button>
                                 <form action="{{ route('assignments.destroy', $item->id) }}" method="POST" class="d-inline">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-icon btn-active-color-danger" onclick="return confirm('Hapus tugas ini?')">
+                                    <button type="submit" class="btn btn-sm btn-icon btn-active-color-danger confirm-delete" >
                                         <i class="ki-outline ki-trash fs-2"></i>
                                     </button>
                                 </form>
@@ -138,7 +138,24 @@
                     </div>
                 </div>
             </div>
-            @endforeach
+            @empty
+            <div class="col-12">
+                <div class="card border-dashed border-gray-300">
+                                <div class="card-header mt-5 border-0 pt-6">
+                <div class="card-title flex-column">
+                    <h3 class="fw-bold mb-1">Daftar Penugasan Siswa</h3>
+                </div>
+            </div>
+            <div class="card-body">
+                        <div class="text-center px-4 py-15">
+                            <img src="{{ asset('assets/media/illustrations/sigma-1/5.png') }}" alt="" class="mw-100 mh-200px mb-7">
+                            <h3 class="fw-bold text-gray-900 mb-2">Belum ada penugasan siswa</h3>
+                            <p class="text-gray-400 fs-6 fw-semibold">Daftar tugas, instruksi, dan pantau pengumpulan jawaban siswa belum tersedia.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endforelse
         </div>
     </div>
 </div>
@@ -189,7 +206,7 @@
                     </div>
                 </div>
                 <div class="modal-footer flex-center">
-                    <button type="submit" class="btn btn-primary">Simpan Tugas</button>
+                    <button type="submit" class="btn btn-primary confirm-delete">Simpan Tugas</button>
                 </div>
             </form>
         </div>
@@ -224,7 +241,7 @@
                     </div>
                 </div>
                 <div class="modal-footer flex-center">
-                    <button type="submit" class="btn btn-primary">Update Tugas</button>
+                    <button type="submit" class="btn btn-primary confirm-delete">Update Tugas</button>
                 </div>
             </form>
         </div>
@@ -246,5 +263,31 @@
         });
     });
 </script>
+
+
+@push('scripts')
+<script>
+    document.querySelectorAll('.confirm-delete').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = this.closest('form');
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data yang dihapus tidak dapat dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
+@endpush
 
 @endsection

@@ -27,7 +27,7 @@
                             </tr>
                         </thead>
                         <tbody class="fs-6">
-                            @foreach($enrollments as $item)
+                            @forelse($enrollments as $item)
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center">
@@ -48,18 +48,23 @@
                                 <td class="text-end">
                                     <form action="{{ route('enrollments.destroy', $item->id) }}" method="POST" class="d-inline">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="btn btn-icon btn-sm btn-light-danger btn-active-danger" onclick="return confirm('Keluarkan siswa dari kelas ini?')" title="Hapus dari Rombel">
+                                        <button type="submit" class="btn btn-icon btn-sm btn-light-danger btn-active-danger confirm-delete"  title="Hapus dari Rombel">
                                             <i class="ki-outline ki-trash fs-2"></i>
                                         </button>
                                     </form>
                                 </td>
                             </tr>
-                            @endforeach
-                            @if($enrollments->isEmpty())
+                            @empty
                             <tr>
-                                <td colspan="5" class="text-center py-10 text-muted">Belum ada siswa yang diplot ke kelas.</td>
+                                <td colspan="5">
+                                    <div class="text-center px-4 py-15">
+                                        <img src="{{ asset('assets/media/illustrations/sigma-1/5.png') }}" alt="" class="mw-100 mh-200px mb-7">
+                                        <h3 class="fw-bold text-gray-900 mb-2">Belum ada rombongan belajar</h3>
+                                        <p class="text-gray-400 fs-6 fw-semibold">Data penempatan siswa ke dalam kelas (Rombel) belum tersedia. Silakan lakukan plotting siswa.</p>
+                                    </div>
+                                </td>
                             </tr>
-                            @endif
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -113,11 +118,37 @@
                 </div>
                 <div class="modal-footer flex-center">
                     <button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Plotting Siswa</button>
+                    <button type="submit" class="btn btn-primary confirm-delete">Plotting Siswa</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+
+@push('scripts')
+<script>
+    document.querySelectorAll('.confirm-delete').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = this.closest('form');
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data yang dihapus tidak dapat dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
+@endpush
 
 @endsection

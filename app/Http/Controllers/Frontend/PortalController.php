@@ -94,6 +94,29 @@ class PortalController extends Controller
             $q->where('class_room_id', $classId);
         })->with(['teachingAssignment.teacher.user', 'teachingAssignment.subject'])->latest()->take(5)->get();
 
-        return view('frontend.dashboard.index', compact('stats', 'recentModules'));
+        $recentAssignments = Assignment::whereHas('teachingAssignment', function($q) use ($classId) {
+            $q->where('class_room_id', $classId);
+        })->with(['teachingAssignment.subject'])->latest()->take(5)->get();
+
+        // Gabungkan modul dan tugas sebagai "Pengumuman"
+        $announcements = collect();
+        foreach ($recentModules as $mod) {
+            $announcements->push([
+                'title' => 'Modul baru ' . ($mod->teachingAssignment->subject->name ?? '') . ' telah diunggah.',
+                'time' => $mod->created_at,
+                'color' => 'success',
+            ]);
+        }
+        foreach ($recentAssignments as $task) {
+            $announcements->push([
+                'title' => 'Tugas baru ' . ($task->teachingAssignment->subject->name ?? '') . ' ditambahkan. Batas: ' . \Carbon\Carbon::parse($task->due_date)->format('d M'),
+                'time' => $task->created_at,
+                'color' => 'warning',
+            ]);
+        }
+
+        $announcements = $announcements->sortByDesc('time')->take(5);
+
+        return view('frontend.dashboard.index', compact('stats', 'recentModules', 'announcements'));
     }
 }

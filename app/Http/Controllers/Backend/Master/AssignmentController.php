@@ -23,6 +23,21 @@ class AssignmentController extends Controller
             $assignments = TeachingAssignment::with(['subject', 'classRoom'])
                 ->where('teacher_id', $teacherId)
                 ->get();
+        } elseif ($user->hasRole('Siswa')) {
+            if (!$user->student) {
+                return redirect()->route('student.dashboard')->with('error', 'Profil siswa tidak ditemukan.');
+            }
+            
+            $studentId = $user->student->id;
+            $classId = \App\Models\ClassStudent::where('student_id', $studentId)
+                ->whereHas('academicYear', function($q) { $q->where('is_active', 1); })
+                ->value('class_room_id');
+
+            $query->whereHas('teachingAssignment', function($q) use ($classId) {
+                $q->where('class_room_id', $classId);
+            });
+            
+            $assignments = [];
         } else {
             $assignments = TeachingAssignment::with(['teacher.user', 'subject', 'classRoom'])->get();
         }
