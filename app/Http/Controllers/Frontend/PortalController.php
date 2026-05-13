@@ -117,6 +117,21 @@ class PortalController extends Controller
 
         $announcements = $announcements->sortByDesc('time')->take(5);
 
-        return view('frontend.dashboard.index', compact('stats', 'recentModules', 'announcements'));
+        // Cari Kelas Virtual Aktif
+        $now = Carbon::now();
+        $dayOfWeek = $now->dayOfWeekIso;
+        $currentTime = $now->format('H:i:s');
+
+        $activeLiveClass = \App\Models\Schedule::where('day_of_week', $dayOfWeek)
+            ->where('start_time', '<=', $currentTime)
+            ->where('end_time', '>=', $currentTime)
+            ->whereNotNull('meeting_url')
+            ->whereHas('teachingAssignment', function($q) use ($classId) {
+                $q->where('class_room_id', $classId);
+            })
+            ->with(['teachingAssignment.subject', 'teachingAssignment.teacher.user'])
+            ->first();
+
+        return view('frontend.dashboard.index', compact('stats', 'recentModules', 'announcements', 'activeLiveClass'));
     }
 }

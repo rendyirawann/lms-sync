@@ -135,6 +135,10 @@
                             <input type="time" name="end_time" class="form-control form-control-solid" required>
                         </div>
                     </div>
+                    <div class="fv-row mb-7">
+                        <label class="fs-6 fw-semibold mb-2">Link Meeting (Zoom/Jitsi)</label>
+                        <input type="url" name="meeting_url" class="form-control form-control-solid" placeholder="https://zoom.us/j/...">
+                    </div>
                 </div>
                 <div class="modal-footer flex-center">
                     <button type="submit" class="btn btn-primary">Simpan Jadwal</button>
@@ -178,6 +182,10 @@
                             <label class="required fs-6 fw-semibold mb-2">Jam Selesai</label>
                             <input type="time" name="end_time" class="form-control form-control-solid" value="{{ $item->end_time }}" required>
                         </div>
+                    </div>
+                    <div class="fv-row mb-7">
+                        <label class="fs-6 fw-semibold mb-2">Link Meeting (Zoom/Jitsi)</label>
+                        <input type="url" name="meeting_url" class="form-control form-control-solid" value="{{ $item->meeting_url }}" placeholder="https://zoom.us/j/...">
                     </div>
                 </div>
                 <div class="modal-footer flex-center">

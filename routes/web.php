@@ -184,13 +184,25 @@ Route::middleware(['auth', 'role:Siswa'])->prefix('portal')->group(function () {
     Route::resource('/my-profile', ProfileController::class, ['as' => 'student']);
     Route::resource('/my-security', SecurityController::class, ['as' => 'student']);
 
-    // Portal Akademik (Shared Controllers)
     Route::get('/learning-modules', [\App\Http\Controllers\Backend\Master\LearningModuleController::class, 'index'])->name('student.learning-modules.index');
-    Route::get('/learning-modules/{id}/download', [\App\Http\Controllers\Backend\Master\LearningModuleController::class, 'download'])->name('student.learning-modules.download');
-    
     Route::get('/assignments', [\App\Http\Controllers\Backend\Master\AssignmentController::class, 'index'])->name('student.assignments.index');
     Route::get('/assignments/{id}', [\App\Http\Controllers\Backend\Master\AssignmentController::class, 'show'])->name('student.assignments.show');
     Route::post('/assignments/{id}/submit', [\App\Http\Controllers\Backend\Master\AssignmentController::class, 'submit'])->name('student.assignments.submit');
+});
+
+// Portal Routes for All Authenticated Users (Siswa, Guru, Superadmin)
+Route::middleware(['auth'])->prefix('portal')->group(function () {
+    // Pesan Internal (Chat)
+    Route::get('/chat', [\App\Http\Controllers\Frontend\ChatController::class, 'index'])->name('student.chat.index');
+    Route::get('/chat/{receiverId}', [\App\Http\Controllers\Frontend\ChatController::class, 'show'])->name('student.chat.show');
+    Route::post('/chat', [\App\Http\Controllers\Frontend\ChatController::class, 'store'])->name('student.chat.store');
+
+    // Detail Modul & Download (diakses oleh Guru/Admin dari backend)
+    Route::get('/learning-modules/{id}', [\App\Http\Controllers\Backend\Master\LearningModuleController::class, 'show'])->name('student.learning-modules.show');
+    Route::get('/learning-modules/{id}/download', [\App\Http\Controllers\Backend\Master\LearningModuleController::class, 'download'])->name('student.learning-modules.download');
+
+    // Forum Diskusi Modul
+    Route::post('/module-comments', [\App\Http\Controllers\Frontend\ModuleCommentController::class, 'store'])->name('module-comments.store');
 });
 
 // Load Routes Authentication (Login, Register, Reset Password)

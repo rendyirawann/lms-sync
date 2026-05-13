@@ -12,6 +12,7 @@ class LearningModule extends Model
         'teaching_assignment_id',
         'title',
         'description',
+        'zoom_link',
         'file_path',
         'file_name',
         'file_type',
@@ -22,6 +23,11 @@ class LearningModule extends Model
     public function teachingAssignment()
     {
         return $this->belongsTo(TeachingAssignment::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(ModuleComment::class)->whereNull('parent_id')->orderBy('created_at', 'desc');
     }
 
     public function getFormattedFileSizeAttribute()

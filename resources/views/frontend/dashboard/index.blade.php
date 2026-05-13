@@ -65,6 +65,22 @@
             </div>
         </div>
 
+        @if($activeLiveClass)
+        <!-- Live Class Alert -->
+        <div class="alert alert-dismissible bg-light-primary border border-primary border-dashed d-flex flex-column flex-sm-row p-5 mb-10">
+            <i class="ki-outline ki-video fs-2hx text-primary me-4 mb-5 mb-sm-0"></i>
+            <div class="d-flex flex-column pe-0 pe-sm-10">
+                <h5 class="mb-1">Kelas Virtual Sedang Berlangsung!</h5>
+                <span>Mata Pelajaran <strong>{{ $activeLiveClass->teachingAssignment->subject->name }}</strong> oleh <strong>{{ $activeLiveClass->teachingAssignment->teacher->user->name }}</strong> sedang berlangsung sekarang.</span>
+            </div>
+            <div class="ms-sm-auto">
+                <a href="{{ $activeLiveClass->meeting_url }}" target="_blank" class="btn btn-primary fw-bold text-nowrap mt-3 mt-sm-0">
+                    Masuk Kelas Virtual
+                </a>
+            </div>
+        </div>
+        @endif
+
         <!-- Attendance Status Bar -->
         <div class="row g-5 mb-10">
             <div class="col-12">

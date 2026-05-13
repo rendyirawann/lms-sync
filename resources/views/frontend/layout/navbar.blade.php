@@ -37,6 +37,11 @@
 							<span class="menu-title">Jadwal</span>
 						</a>
 					</div>
+					<div class="menu-item me-0 me-lg-2">
+						<a href="{{ route('student.chat.index') }}" class="menu-link {{ request()->routeIs('student.chat.*') ? 'active' : '' }}">
+							<span class="menu-title">💬 Pesan</span>
+						</a>
+					</div>
 				</div>
 			</div>
 
@@ -95,7 +100,7 @@
 						<div class="menu-item px-3">
 							<div class="menu-content d-flex align-items-center px-3">
 								<div class="symbol symbol-50px me-5">
-									<img alt="Avatar" src="{{ asset('assets/media/avatars/300-1.jpg') }}" />
+									<img alt="Avatar" src="{{ auth()->user()->avatar_url }}" />
 								</div>
 								<div class="d-flex flex-column">
 									<div class="fw-bold d-flex align-items-center fs-5">{{ auth()->user()->name }}

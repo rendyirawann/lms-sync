@@ -61,6 +61,7 @@ class LearningModuleController extends Controller
         $request->validate([
             'teaching_assignment_id' => 'required',
             'title' => 'required|string|max:255',
+            'zoom_link' => 'nullable|url',
             'file' => 'required|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:20480', // Max 20MB
         ]);
 
@@ -77,6 +78,7 @@ class LearningModuleController extends Controller
                 'teaching_assignment_id' => $request->teaching_assignment_id,
                 'title' => $request->title,
                 'description' => $request->description,
+                'zoom_link' => $request->zoom_link,
                 'file_path' => $path,
                 'file_name' => $originalName,
                 'file_type' => $extension,
@@ -96,6 +98,7 @@ class LearningModuleController extends Controller
         
         $request->validate([
             'title' => 'required|string|max:255',
+            'zoom_link' => 'nullable|url',
             'file' => 'nullable|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:20480',
         ]);
 
@@ -103,8 +106,13 @@ class LearningModuleController extends Controller
             $data = [
                 'title' => $request->title,
                 'description' => $request->description,
+                'zoom_link' => $request->zoom_link,
                 'is_published' => $request->has('is_published') ? true : false,
             ];
+            
+            if ($request->has('teaching_assignment_id')) {
+                $data['teaching_assignment_id'] = $request->teaching_assignment_id;
+            }
 
             if ($request->hasFile('file')) {
                 // Hapus file lama
@@ -146,6 +154,23 @@ class LearningModuleController extends Controller
     public function download($id)
     {
         $module = LearningModule::findOrFail($id);
+        
+        if (!Storage::disk('public')->exists($module->file_path)) {
+            return redirect()->back()->with('error', 'Mohon maaf, file fisik modul tidak ditemukan di server. Jika ini adalah data dummy, silakan edit modul dan unggah file PDF yang asli.');
+        }
+
         return Storage::disk('public')->download($module->file_path, $module->file_name);
+    }
+
+    public function show($id)
+    {
+        $item = LearningModule::with([
+            'teachingAssignment.teacher.user', 
+            'teachingAssignment.subject', 
+            'comments.user', 
+            'comments.replies.user'
+        ])->findOrFail($id);
+
+        return view('backend.master.learning-modules.show', compact('item'));
     }
 }

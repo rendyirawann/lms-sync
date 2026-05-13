@@ -41,6 +41,7 @@ class ScheduleController extends Controller
             'day_of_week' => 'required|integer|min:1|max:7',
             'start_time' => 'required',
             'end_time' => 'required|after:start_time',
+            'meeting_url' => 'nullable|url',
         ]);
 
         Schedule::create($request->all());
@@ -54,6 +55,7 @@ class ScheduleController extends Controller
             'day_of_week' => 'required|integer|min:1|max:7',
             'start_time' => 'required',
             'end_time' => 'required|after:start_time',
+            'meeting_url' => 'nullable|url',
         ]);
 
         $schedule->update($request->all());

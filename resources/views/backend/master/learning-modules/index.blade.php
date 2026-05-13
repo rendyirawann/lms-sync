@@ -80,7 +80,10 @@
 
                     <div class="card-footer p-2 border-0 bg-light-dark bg-opacity-10">
                         <div class="d-flex justify-content-between align-items-center px-2">
-                            <div class="d-flex gap-1">
+                            <div class="d-flex gap-1 align-items-center flex-wrap">
+                                <a href="{{ route('student.learning-modules.show', $item->id) }}" class="btn btn-sm btn-light-primary fw-bold text-nowrap" title="Detail & Diskusi">
+                                    <i class="ki-outline ki-message-text-2 fs-3 me-1"></i> Diskusi
+                                </a>
                                 <button type="button" class="btn btn-sm btn-icon btn-light-primary" 
                                     onclick="initViewer('{{ $fileUrl }}', '{{ $extension }}', '{{ $item->title }}')" 
                                     title="Pratinjau Modul">
@@ -91,7 +94,7 @@
                                 </a>
                             </div>
                             @hasanyrole('Superadmin|Guru')
-                            <div class="d-flex gap-1">
+                            <div class="d-flex gap-1 align-items-center flex-wrap">
                                 <button class="btn btn-sm btn-icon btn-light-warning" data-bs-toggle="modal" data-bs-target="#editModal{{ $item->id }}">
                                     <i class="ki-outline ki-pencil fs-2"></i>
                                 </button>
@@ -265,13 +268,25 @@
                         <label class="fs-6 fw-semibold mb-2">Deskripsi (Opsional)</label>
                         <textarea name="description" class="form-control form-control-solid" rows="3"></textarea>
                     </div>
+                    <div class="fv-row mb-7">
+                        <label class="fs-6 fw-semibold mb-2">Link Zoom Kelas Virtual (Opsional)</label>
+                        <input type="url" name="zoom_link" class="form-control form-control-solid" placeholder="https://zoom.us/j/...">
+                    </div>
                     <div class="fv-row mb-10">
                         <label class="required fs-6 fw-semibold mb-2">Pilih File Modul</label>
                         <input type="file" name="file" class="form-control form-control-solid" required>
                     </div>
+                    <div class="fv-row">
+                        <div class="form-check form-switch form-check-custom form-check-solid">
+                            <input class="form-check-input" type="checkbox" name="is_published" value="1" id="flexSwitchDefault" checked/>
+                            <label class="form-check-label" for="flexSwitchDefault">
+                                Publikasikan Modul (Terlihat oleh siswa)
+                            </label>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer flex-center">
-                    <button type="submit" class="btn btn-primary confirm-delete">Unggah Modul</button>
+                    <button type="submit" class="btn btn-primary">Unggah Modul</button>
                 </div>
             </form>
         </div>
@@ -282,7 +297,7 @@
 <div class="modal fade drawer-modal" id="editModal{{ $item->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog mw-650px">
         <div class="modal-content">
-            <form action="{{ route('learning-modules.update', $item->id) }}" method="POST">
+            <form action="{{ route('learning-modules.update', $item->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf @method('PUT')
                 <div class="modal-header">
                     <h2 class="fw-bold">Edit Modul</h2>
@@ -292,12 +307,42 @@
                 </div>
                 <div class="modal-body px-10 py-10">
                     <div class="fv-row mb-7">
+                        <label class="required fs-6 fw-semibold mb-2">Pilih Kelas / Penugasan</label>
+                        <select name="teaching_assignment_id" class="form-select form-select-solid" data-control="select2" data-dropdown-parent="#editModal{{ $item->id }}" required>
+                            <option value="">Pilih Penugasan...</option>
+                            @foreach($assignments as $a)
+                                <option value="{{ $a->id }}" {{ $item->teaching_assignment_id == $a->id ? 'selected' : '' }}>{{ $a->classRoom->name }} - {{ $a->subject->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="fv-row mb-7">
                         <label class="required fs-6 fw-semibold mb-2">Judul Modul</label>
                         <input type="text" name="title" class="form-control form-control-solid" value="{{ $item->title }}" required>
                     </div>
+                    <div class="fv-row mb-7">
+                        <label class="fs-6 fw-semibold mb-2">Deskripsi (Opsional)</label>
+                        <textarea name="description" class="form-control form-control-solid" rows="3">{{ $item->description }}</textarea>
+                    </div>
+                    <div class="fv-row mb-7">
+                        <label class="fs-6 fw-semibold mb-2">Link Zoom Kelas Virtual (Opsional)</label>
+                        <input type="url" name="zoom_link" class="form-control form-control-solid" value="{{ $item->zoom_link }}" placeholder="https://zoom.us/j/...">
+                    </div>
+                    <div class="fv-row mb-10">
+                        <label class="fs-6 fw-semibold mb-2">Ganti File Modul (Opsional)</label>
+                        <input type="file" name="file" class="form-control form-control-solid">
+                        <div class="text-muted fs-7 mt-2">Biarkan kosong jika tidak ingin mengubah file modul. (File saat ini: {{ $item->file_name }})</div>
+                    </div>
+                    <div class="fv-row">
+                        <div class="form-check form-switch form-check-custom form-check-solid">
+                            <input class="form-check-input" type="checkbox" name="is_published" value="1" id="flexSwitch{{ $item->id }}" {{ $item->is_published ? 'checked' : '' }}/>
+                            <label class="form-check-label" for="flexSwitch{{ $item->id }}">
+                                Publikasikan Modul (Terlihat oleh siswa)
+                            </label>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer flex-center">
-                    <button type="submit" class="btn btn-primary confirm-delete">Simpan Perubahan</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                 </div>
             </form>
         </div>

@@ -150,6 +150,17 @@
 									</a>
 								</div>
 								<!--end:Menu item-->
+
+								<!--begin:Menu item-->
+								<div class="menu-item">
+									<a class="menu-link {{ request()->routeIs('student.chat.*') ? 'active' : '' }}" href="{{ route('student.chat.index') }}">
+										<span class="menu-icon">
+											<i class="ki-outline ki-messages fs-2"></i>
+										</span>
+										<span class="menu-title">Pesan Internal</span>
+									</a>
+								</div>
+								<!--end:Menu item-->
                                 @endif
 
                                 @can('view_resources')

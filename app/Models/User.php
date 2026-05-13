@@ -72,4 +72,17 @@ class User extends Authenticatable implements BannableContract
     {
         return $this->hasOne(Student::class);
     }
+
+    /**
+     * Get avatar URL with fallback to UI-Avatars.
+     */
+    public function getAvatarUrlAttribute(): string
+    {
+        if ($this->avatar && file_exists(storage_path('app/public/' . $this->avatar))) {
+            return asset('storage/' . $this->avatar);
+        }
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=6a11cb&color=fff&size=128&bold=true';
+    }
+
+    protected $appends = ['avatar_url'];
 }
